@@ -22,8 +22,30 @@
           waitingScreen()
         }
         if(data.type == 'SelectPlayer'){
-          WhosTurnIsITScreen(data.message)
-          console.log(data)
+          WhosTurnIsITScreen(data.whosTurn)
+        }
+        if(data.type == 'updateClueGiver'){
+          updateClueGiver(data.points, data.username, data.whosTurn)
+
+        }
+        if(data.type == 'updateGuessers'){
+          updateGuessers(data.points, data.username, data.whosTurn)
+        }
+
+        if(data.type == 'ClueGiverisReady'){
+          waitingScreen()
+        }
+
+        if(data.type == 'hostGuessingScreen'){
+          addSlider(50, "no")
+          
+        }
+        if(data.type == 'guessingScreen'){
+          addSlider(50, "no")
+          addConfirmButtn()
+        }
+        if(data.type == 'allGuessed'){
+          evaluationScreen(data.points,data.message)
         }
       })
 
@@ -47,18 +69,22 @@
 
 
       //displays slider onto the host screen fro everyone to see 
-      function addSlider(){
-        let randValue = Math.floor(Math.random() * 87 )
+      function addSlider(value = 50, color = 'yes'){
         const targetDiv = document.getElementById('playerNames');
+        targetDiv.innerHTML = ''
         const newInput = document.createElement('input');
         newInput.type = "range"
         newInput.min = "1"
         newInput.max = "100"
-        newInput.value =  randValue.toString()
+        newInput.value =  value.toString()
         newInput.id = "myRange" 
         newInput.classList.add("slider")
         targetDiv.appendChild(newInput)
-        sliderColor(randValue)
+
+        if(color == "yes"){
+          sliderColor(randValue)
+        }
+        //return randValue
       }
 
       //adds effects to the slider and its colors 
@@ -94,7 +120,6 @@
       function removeHostLogin(){
         const targetDiv = document.getElementById('login');
         targetDiv.innerHTML = ''
-
       }
 
       //adds start button for the host 
@@ -105,27 +130,135 @@
         startButton.id = "startButton"
         startButton.innerHTML = "START GAME"
         targetDiv.appendChild(startButton)
-        document.getElementById("startButton").addEventListener('click', startGame);
+        document.getElementById("startButton").addEventListener('click', () => {
+          startButton.remove()
+          startGame()});
 
       }
+
+      function addConfirmButtn(){
+        const targetDiv = document.getElementById("body")
+        const slider = document.getElementById("myRange")
+        const confirmButton = document.createElement("button")
+        confirmButton.id = "confirmButton"
+        confirmButton.innerHTML = "Confirm"
+        targetDiv.appendChild(confirmButton)
+
+        document.getElementById("confirmButton").addEventListener('click', () => {
+          socket.send(JSON.stringify({type: "guesedVal", value: slider.value}))
+          confirmButton.remove()
+          waitingScreen()
+        });
+      }
+
 
       // starts the game
       function startGame(){
         const data = {type: "startGame"}
-        socket.send(JSON.stringify(data))
+        const time = countDown(3,"WhosTurn","Game Starts in: ", data, "Starting..")
       }
 
+      //
       function WhosTurnIsITScreen(data){
-        const targetDiv = document.getElementById('body');
-        const playerTrun = document.createElement('h1')
-        playerTrun.innerHTML = `${data} turn `
-        targetDiv.appendChild(playerTrun)
+        const targetTag = document.getElementById('WhosTurn');
+        const playerNames = document.getElementById('playerNames')
+        playerNames.innerHTML = ''
+        targetTag.innerHTML = `${data} turn `
 
+      }
+
+      function clearwhosTurn(){
+        const targetTag = document.getElementById('WhosTurn');
+        targetTag.innerHTML = ``
+      }
+
+      function updateStatusBar(points,player,playersTurn){
+        clearwhosTurn()
+        const targetDiv = document.getElementById('statusBar')
+        targetDiv.innerHTML = ""
+        const username = document.createElement('h1')
+        username.id = "playerName"
+        const playerPoints = document.createElement('h1')
+        playerPoints.id = "playerPoints"
+        const clueGiver = document.createElement('h1')
+        clueGiver.id = "clueGiver"
+        if(player == playersTurn){
+          clueGiver.innerHTML = `ClueGiver: You`
+        }
+        else{
+          clueGiver.innerHTML = `ClueGiver: ${playersTurn}`
+        }
+        username.innerHTML = `user: ${player}`
+        playerPoints.innerHTML = `Points: ${points}`
+        targetDiv.appendChild(username)
+        targetDiv.appendChild(playerPoints)
+        targetDiv.appendChild(clueGiver)
+      }
+
+
+      //update guessers
+      function updateGuessers(points,player,playersTurn){
+        updateStatusBar(points,player,playersTurn)
+      }
+
+      //update cluegiver screen
+      function updateClueGiver(points,player,playersTurn){
+        randValue = 50//Math.floor(Math.random() * 87 )
+        addSlider(randValue)
+        updateStatusBar(points,player,playersTurn)
+        addReadyButton(playersTurn)
+        socket.send(JSON.stringify({type: "ClueValue", value: randValue}))
+        
+      }
+
+      function addReadyButton(playersTurn){
+        const targetDiv = document.getElementById('body')
+        const readyBttn = document.createElement('button')
+        readyBttn.id = 'readyBttn'
+        readyBttn.innerHTML = 'Ready'
+
+        targetDiv.appendChild(readyBttn)
+        readyBttn.addEventListener('click', () => {
+          socket.send(JSON.stringify({type: 'startGuessing', playersTurn: playersTurn}))
+          readyBttn.remove()
+        })
+      }
+
+
+      // creates a countdown with specified time, text and data to send
+      function countDown(time,element,text,data, str = ''){
+        const targetTag = document.getElementById(element)
+        let timeLeft = time
+        const timer = setInterval(function(){ timeLeft -= 1
+          targetTag.innerHTML = text + timeLeft.toString()
+
+          if (timeLeft <= 0){
+            clearInterval(timer)
+            targetTag.innerHTML = str
+
+            setTimeout(() => {socket.send(JSON.stringify(data));}, 2000);
+          }
+          
+        },1000)
       }
       // updates the secreen to waiting screen when users enter the game
       function waitingScreen(){
         removeHostLogin()
-        addSlider()
+        const targetDiv = document.getElementById('playerNames')
+        targetDiv.innerHTML = ''
+        const targetTag = document.getElementById('WhosTurn');
+        targetTag.innerHTML = ''
+
+      }
+
+      function evaluationScreen( points, message){
+        const targetTag = document.getElementById('playerPoints')
+        targetTag.innerHTML = `Points: ${points}`
+        const displayMessage = document.getElementById('playerNames')
+        displayMessage.innerHTML = message
+
+        setTimeout(() => {socket.send(JSON.stringify({type: "startGame"}));}, 2000);
+
       }
 
       
