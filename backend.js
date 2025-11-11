@@ -1,4 +1,5 @@
  const socket = new WebSocket('ws://localhost:8080');
+ 
 
       socket.onopen = () => {
         console.log('Connected to server');
@@ -11,18 +12,19 @@
       // depending on the message of the server this determines the action to take
       socket.addEventListener('message', event => {
         const data = JSON.parse(event.data)
-        if(data.type == 'updatePlayerBoard'){
-          displayPlayers(data.message)
-        }
-        if(data.type == 'updateHost'){
+        if(data.type == 'MainMenu'){
           removeHostLogin()
           AddStartButton()
         }
-        if(data.type == 'WaitingScreen'){
+
+        if(data.type == 'updatePlayerBoard'){
+          displayPlayers(data.playerList)
+        }
+        if(data.type == 'waitingScreen'){
           waitingScreen()
         }
         if(data.type == 'SelectPlayer'){
-          WhosTurnIsITScreen(data.whosTurn)
+          WhosTurnIsITScreen(data.whosTurn,data.myTurn)
         }
         if(data.type == 'updateClueGiver'){
           updateClueGiver(data.points, data.username, data.whosTurn)
@@ -45,7 +47,7 @@
           addConfirmButtn()
         }
         if(data.type == 'allGuessed'){
-          evaluationScreen(data.points,data.message)
+          evaluationScreen(data.points,data.message,data.myTurn)
         }
       })
 
@@ -159,11 +161,12 @@
       }
 
       //
-      function WhosTurnIsITScreen(data){
+      function WhosTurnIsITScreen(data,myTurn){
         const targetTag = document.getElementById('WhosTurn');
         const playerNames = document.getElementById('playerNames')
         playerNames.innerHTML = ''
         targetTag.innerHTML = `${data} turn `
+
 
       }
 
@@ -203,7 +206,7 @@
 
       //update cluegiver screen
       function updateClueGiver(points,player,playersTurn){
-        randValue = 50//Math.floor(Math.random() * 87 )
+        randValue = 50 //Math.floor(Math.random() * 87 )
         addSlider(randValue)
         updateStatusBar(points,player,playersTurn)
         addReadyButton(playersTurn)
@@ -251,13 +254,15 @@
 
       }
 
-      function evaluationScreen( points, message){
+      function evaluationScreen( points, message, myTurn){
         const targetTag = document.getElementById('playerPoints')
         targetTag.innerHTML = `Points: ${points}`
         const displayMessage = document.getElementById('playerNames')
         displayMessage.innerHTML = message
 
-        setTimeout(() => {socket.send(JSON.stringify({type: "startGame"}));}, 2000);
+        if(myTurn){
+          setTimeout(() => {socket.send(JSON.stringify({type: "startGame"}));}, 2000);
+        }
 
       }
 

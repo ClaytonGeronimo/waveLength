@@ -6,6 +6,7 @@ const players = []
 playersTurn = 1
 isHost = true
 clueVlaue = null
+let statusBarUpdated = false;
 
 server.on('connection', ws => {
   console.log('🟢 New client connected'); 
@@ -14,24 +15,13 @@ server.on('connection', ws => {
   ws.on('message', message => {
     const data = JSON.parse(message);
     if (data.type == 'login'){
-      // adds new players into the db and sends message back to client confirming
-      if(data.username == 'host'){
-        ws.send(JSON.stringify({type: 'updateHost'}))
-        players.push({username: data.username, points: 0, guess: null, clientID: ws, guessed: false})
-        clients.set(data.username,ws)
-      }
-      else{ 
-        players.push({username: data.username, points: 0,guess: null, clientID: ws, guessed: false})
-        clients.set(data.username,ws)
-        ws.send(JSON.stringify({message: players}))
-        ws.send(JSON.stringify({type: 'WaitingScreen'}))
-      }
-      updateHost('host')
-
-      
+      newClient(data.username)
     }
     if(data.type == 'startGame'){
-            WhosTurnisIT()
+      WhosTurnisIT()
+    }
+    if(data.type == 'updateStatusBar'){
+      updateStatusBar()
     }
     if(data.type == 'startGuessing'){
       startGuessing(data.playersTurn)
@@ -40,11 +30,25 @@ server.on('connection', ws => {
       clueVlaue = data.value
     }
     if(data.type == 'guesedVal'){
-        updateGuess(data.value)
+      updateGuess(data.value)
     }
   });
 
-
+  function newClient(username){
+    if(username == 'host'){
+      players.push({username: username, points: 0, guess: null, clientID: ws, guessed: false})
+      clients.set(username,ws)
+      clients.get('host').send(JSON.stringify({type: 'MainMenu'}))
+      clients.get('host').send(JSON.stringify({type: 'updatePlayerBoard', playerList: players}))
+    }
+    else{
+      players.push({username: username, points: 0, guess: null, clientID: ws, guessed: false})
+      clients.set(username,ws)
+      ws.send(JSON.stringify({type: "waitingScreen"}))
+      clients.get('host').send(JSON.stringify({type: 'updatePlayerBoard' , playerList: players}))
+    }
+     
+  }
 
   function updateHost(clientId){
     const ws = clients.get(clientId)
@@ -62,17 +66,19 @@ server.on('connection', ws => {
       
       const data = {type: 'SelectPlayer', username: players[CurrPlayer].username, whosTurn: players[playersTurn].username, points: players[CurrPlayer].points}
       client.send(JSON.stringify(data))
+      CurrPlayer += 1
     });
+    setTimeout(() => {updateStatusBar()}, 2000);
 
-      setTimeout(() => {updateStatusBar()}, 2000);
       
   }
 
   function updateStatusBar(){
+
     let CurrPlayer = 0
     server.clients.forEach((client) => {
       if(client != clients.get('host')){
-        if(client == players[playersTurn].clientID){
+        if(CurrPlayer == playersTurn){
           const data = {type: 'updateClueGiver', username: players[CurrPlayer].username, whosTurn: players[playersTurn].username, points: players[CurrPlayer].points}
           client.send(JSON.stringify(data))
         }
@@ -83,7 +89,7 @@ server.on('connection', ws => {
       }
       CurrPlayer += 1
       });
-      CurrPlayer = 0
+
   }
 
   function startGuessing(playersTurn){
@@ -153,11 +159,11 @@ server.on('connection', ws => {
               players[i].points += 1
               cluegiverGainedPoints += 1
             }
-            players[i].clientID.send(JSON.stringify({type: 'allGuessed',points: players[i].points, message: "Your Safe!"  }))
+            players[i].clientID.send(JSON.stringify({type: 'allGuessed',points: players[i].points, message: "Your Safe!", myTurn: false}))
           }
 
           else {
-            players[i].clientID.send(JSON.stringify({type: 'allGuessed',points: players[i].points, message: "Drink up buddy"  }))
+            players[i].clientID.send(JSON.stringify({type: 'allGuessed',points: players[i].points, message: "Drink up buddy", myTurn: false  }))
           }
       }
 
@@ -167,10 +173,10 @@ server.on('connection', ws => {
     
     players[playersTurn].points += cluegiverGainedPoints
     if(cluegiverGainedPoints == 0){
-      players[playersTurn].clientID.send(JSON.stringify({type: 'allGuessed',points: players[playersTurn].points, message: "Drink up buddy"  }))
+      players[playersTurn].clientID.send(JSON.stringify({type: 'allGuessed',points: players[playersTurn].points, message: "Drink up buddy", myTurn: true  }))
     }
     else{
-      players[playersTurn].clientID.send(JSON.stringify({type: 'allGuessed',points: players[playersTurn].points, message: "well done!"  }))
+      players[playersTurn].clientID.send(JSON.stringify({type: 'allGuessed',points: players[playersTurn].points, message: "well done!", myTurn: true  }))
     }
 
     if(playersTurn == players.length-1){
