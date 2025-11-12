@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/ClaytonGeronimo/waveLength#readme",
   "dependencies": {
+    "express": "^5.1.0",
     "ws": "^8.18.3"
   }
 }

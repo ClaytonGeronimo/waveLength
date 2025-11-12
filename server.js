@@ -1,6 +1,20 @@
 // server.js
+
+const express = require('express');
+const app = express();
+const server = require('http').createServer(app);
 const WebSocket = require('ws');
-const server = new WebSocket.Server({ port: 8080 });
+const path = require('path');
+
+const wss = new WebSocket.Server({ server });
+
+
+
+
+
+
+
+
 const clients = new Map()
 const players = []
 playersTurn = 1
@@ -8,7 +22,7 @@ isHost = true
 clueVlaue = null
 let statusBarUpdated = false;
 
-server.on('connection', ws => {
+wss.on('connection', ws => {
   console.log('🟢 New client connected'); 
 
   // determines the action to take given a message send from client side
@@ -62,7 +76,7 @@ server.on('connection', ws => {
 
   function WhosTurnisIT(){
     let CurrPlayer = 0
-    server.clients.forEach((client) => {
+    wss.clients.forEach((client) => {
       
       const data = {type: 'SelectPlayer', username: players[CurrPlayer].username, whosTurn: players[playersTurn].username, points: players[CurrPlayer].points}
       client.send(JSON.stringify(data))
@@ -76,7 +90,7 @@ server.on('connection', ws => {
   function updateStatusBar(){
 
     let CurrPlayer = 0
-    server.clients.forEach((client) => {
+    wss.clients.forEach((client) => {
       if(client != clients.get('host')){
         if(CurrPlayer == playersTurn){
           const data = {type: 'updateClueGiver', username: players[CurrPlayer].username, whosTurn: players[playersTurn].username, points: players[CurrPlayer].points}
@@ -93,7 +107,7 @@ server.on('connection', ws => {
   }
 
   function startGuessing(playersTurn){
-    server.clients.forEach((client) => {
+    wss.clients.forEach((client) => {
       if(client == clients.get(playersTurn))
       {
         const data = {type: 'ClueGiverisReady'}
@@ -192,10 +206,18 @@ server.on('connection', ws => {
     }
   }
 
+  
 
   ws.on('close', () => {
     console.log('🔴 Client disconnected');
   });
 });
+app.use(express.static(path.join(__dirname, 'public')));
+
+server.listen(3000, '0.0.0.0', () => {
+  console.log("✅ Listening on all interfaces (e.g. http://192.168.x.x:3000)");
+});
+
+
 
 

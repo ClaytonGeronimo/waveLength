@@ -1,4 +1,5 @@
- const socket = new WebSocket('ws://localhost:8080');
+//const socket = new WebSocket(`ws://${location.host}`);
+const socket = new WebSocket(`wss://actinometrical-unseparately-lennox.ngrok-free.dev/`);
  
 
       socket.onopen = () => {
