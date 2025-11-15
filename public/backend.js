@@ -40,11 +40,11 @@ socket.addEventListener('message', event => {
   }
 
   if (data.type == 'hostGuessingScreen') {
-    addSlider(50, "no")
+    addSlider(data.clueVlaue)
 
   }
   if (data.type == 'guessingScreen') {
-    addSlider(50, "no")
+    addSlider(data.clueVlaue)
     addConfirmButtn()
   }
   if (data.type == 'allGuessed') {
@@ -74,43 +74,27 @@ function displayPlayers(data) {
 //displays slider onto the host screen fro everyone to see 
 function addSlider(value = 50, color = 'yes') {
   const targetDiv = document.querySelector('.wrapper');
+  const wheelCover = document.querySelector('.circle2')
+  wheelCover.style.transform = 'rotate(0deg)'
   targetDiv.style.display = "block"
-  // targetDiv.innerHTML = ''
-  // const newInput = document.createElement('input');
-  // newInput.type = "range"
-  // newInput.min = "1"
-  // newInput.max = "100"
-  // newInput.value =  value.toString()
-  // newInput.id = "myRange" 
-  // newInput.classList.add("slider")
-  // targetDiv.appendChild(newInput)
-
-  // if(color == "yes"){
-  //   sliderColor(randValue)
-  // }
-
+  console.log(value)
+  sliderColor(value)
+  
 }
 
 //adds effects to the slider and its colors 
 function sliderColor(start) {
-  const targetTag = document.getElementById('myRange')
-  targetTag.style.background = `linear-gradient(
-        to right,
-        #EDE3C5 0%,
-        #EDE3C5 ${start - 4}%,
-        yellow ${start - 4}%,
-        yellow ${start - 3}%,
-        rgb(245, 65, 10) ${start - 3}%,
-        rgb(245, 65, 10) ${start - 2}%,
-        lightblue ${start - 2}%,
-        lightblue ${start + 1}%,
-        rgb(245, 65, 10) ${start + 1}%,
-        rgb(245, 65, 10) ${start + 2}%,
-        yellow ${start + 2}%,
-        yellow ${start + 3}%,
-        #EDE3C5 ${start + 3}%,
-        #EDE3C5 100%
-  )`
+  const wedge1 = document.querySelector('.wedge1')
+  const wedge2 = document.querySelector('.wedge2')
+  const wedge3 = document.querySelector('.wedge3')
+  const wedge4 = document.querySelector('.wedge4')
+  const wedge5 = document.querySelector('.wedge5')
+  
+  wedge1.style.transform = `rotate(${start}deg)`
+  wedge2.style.transform = `rotate(${start + 7}deg)`
+  wedge3.style.transform = `rotate(${start - 7}deg)`
+  wedge4.style.transform = `rotate(${start + 13}deg)`
+  wedge5.style.transform = `rotate(${start - 13}deg)`
 
 }
 
@@ -141,16 +125,59 @@ function AddStartButton() {
 
 }
 
+const pin = document.querySelector('.pin')
+const circle = document.querySelector('.circle4')
+let isRotating = false
+let angleDeg = null
+
+document.addEventListener('mousedown', (e) => {
+  if (e.target.closest(".pin")) {
+    isRotating = true
+  }
+
+})
+
+const rotatePin = (e) => {
+  if (isRotating) {
+    let knobX = circle.getBoundingClientRect()
+
+    let centerX = knobX.left + knobX.width / 2;
+    let centerY = knobX.top + knobX.height / 2;
+
+    let deltaX = e.clientX - centerX
+    let deltaY = e.clientY - centerY
+
+    //if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1) return;
+
+    let agnleRad = Math.atan2(deltaY, deltaX)
+    angleDeg = (agnleRad * 180) / Math.PI
+
+    if (angleDeg < 0) angleDeg += 360;
+    if (angleDeg >= 180 && angleDeg <= 360) {
+      pin.style.transform = `translate(0, -50%) rotate(${angleDeg}deg)`
+      console.log(angleDeg - 180)
+    }
+
+  }
+}
+
+
+document.addEventListener('mousemove', rotatePin)
+document.addEventListener('mouseup', () => { isRotating = false })
+
 function addConfirmButtn() {
   const targetDiv = document.getElementById("body")
   const slider = document.getElementById("myRange")
   const confirmButton = document.createElement("button")
+  const wheelCover = document.querySelector('.circle2')
   confirmButton.id = "confirmButton"
   confirmButton.innerHTML = "Confirm"
   targetDiv.appendChild(confirmButton)
 
   document.getElementById("confirmButton").addEventListener('click', () => {
-    socket.send(JSON.stringify({ type: "guesedVal", value: slider.value }))
+    wheelCover.style.animation = "reveal 3s forwards"
+    socket.send(JSON.stringify({ type: "guesedVal", value: Math.floor(angleDeg - 180) }))
+    console.log(angleDeg - 180)
     confirmButton.remove()
     waitingScreen()
   });
@@ -209,23 +236,44 @@ function updateGuessers(points, player, playersTurn) {
 
 //update cluegiver screen
 function updateClueGiver(points, player, playersTurn) {
-  randValue = 50 //Math.floor(Math.random() * 87 )
+  randValue = Math.floor(Math.random() * 181 )
   addSlider(randValue)
   updateStatusBar(points, player, playersTurn)
+  addSpinButton()
   addReadyButton(playersTurn)
   socket.send(JSON.stringify({ type: "ClueValue", value: randValue }))
 
 }
 
+function addSpinButton(){
+  const targetDiv = document.getElementById('body')
+  const spinBttn = document.createElement('button')
+  const wheel = document.querySelector('.gear-inner')
+  const wheelCover = document.querySelector('.circle2')
+
+  spinBttn.innerHTML = 'Spin'
+
+  targetDiv.appendChild(spinBttn)
+  spinBttn.addEventListener('click', () => {
+    wheel.style.animation = "counter-clockwise 4s forwards"
+    setTimeout(() => {
+      wheelCover.style.animation = "reveal 3s forwards";
+    }, 5000);
+    spinBttn.remove()
+  })
+}
+
 function addReadyButton(playersTurn) {
   const targetDiv = document.getElementById('body')
   const readyBttn = document.createElement('button')
+  const wheel = document.querySelector('.wrapper');
   readyBttn.id = 'readyBttn'
   readyBttn.innerHTML = 'Ready'
 
   targetDiv.appendChild(readyBttn)
   readyBttn.addEventListener('click', () => {
-    socket.send(JSON.stringify({ type: 'startGuessing', playersTurn: playersTurn }))
+    socket.send(JSON.stringify({ type: 'startGuessing', playersTurn: playersTurn}))
+    wheel.style.display = "none"
     readyBttn.remove()
   })
 }
@@ -271,51 +319,4 @@ function evaluationScreen(points, message, myTurn) {
 }
 
 
-const pin = document.querySelector('.pin')
-const circle = document.querySelector('.circle4')
-let isRotating = false
-
-document.addEventListener('mousedown', (e) => {
-  if (e.target.closest(".pin")) {
-    console.log("banger")
-    isRotating = true
-  }
-
-})
-
-const rotatePin = (e) => {
-  if (isRotating) {
-    let knobX = circle.getBoundingClientRect()
-
-    let centerX = knobX.left + knobX.width / 2;
-    let centerY = knobX.top + knobX.height / 2;
-
-    let deltaX = e.clientX - centerX
-    let deltaY = e.clientY - centerY
-
-    //if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1) return;
-
-    let agnleRad = Math.atan2(deltaY, deltaX)
-    let angleDeg = (agnleRad * 180) / Math.PI
-
-    if (angleDeg < 0) angleDeg += 360;
-    if (angleDeg >= 180 && angleDeg <= 360) {
-      pin.style.transform = `translate(0, -50%) rotate(${angleDeg}deg)`
-      console.log(angleDeg - 180)
-    }
-
-
-
-
-
-
-
-
-  }
-}
-
-
-document.addEventListener('mousemove', rotatePin)
-
-document.addEventListener('mouseup', () => { isRotating = false })
 

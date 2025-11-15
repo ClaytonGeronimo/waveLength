@@ -42,6 +42,7 @@ wss.on('connection', ws => {
     }
     if(data.type == 'ClueValue'){
       clueVlaue = data.value
+      console.log(clueVlaue)
     }
     if(data.type == 'guesedVal'){
       updateGuess(data.value)
@@ -114,19 +115,21 @@ wss.on('connection', ws => {
         client.send(JSON.stringify(data))
       }
       else if(client == clients.get('host')){
-        const data = {type: 'hostGuessingScreen'}
+        const data = {type: 'hostGuessingScreen', clueVlaue: clueVlaue }
         client.send(JSON.stringify(data))
       }
       else{
-        const data = {type: 'guessingScreen'}
+        const data = {type: 'guessingScreen', clueVlaue: clueVlaue}
         client.send(JSON.stringify(data))
       }
     })
   }
   
   function updateGuess(value){
+    console.log(value)
     for(let i = 0; i < players.length; i++){
       if(ws == players[i].clientID){
+        console.log("hello",players[i].guess)
         players[i].guess = value
         players[i].guessed = true
         if(checkAllGuessed()){
@@ -152,11 +155,10 @@ wss.on('connection', ws => {
 
   function updatepoints(pointsgained){
     let cluegiverGainedPoints = 0
-    
     for(let i = 0; i < players.length; i++){
-      let threePoints = (players[i].guess == clueVlaue)
-      let twoPoints = (players[i].guess == clueVlaue + 1 || players[i].guess == clueVlaue - 1)
-      let onePoint = (players[i].guess == clueVlaue + 2 || players[i].guess == clueVlaue - 2)
+      let threePoints = (players[i].guess == clueVlaue || (players[i].guess >= clueVlaue - 2 && players[i].guess <= clueVlaue + 2 ))
+      let twoPoints = ((players[i].guess <= clueVlaue -3 && players[i].guess >= clueVlaue - 8) || (players[i].guess >= clueVlaue + 5 && players[i].guess < clueVlaue + 10))
+      let onePoint = ((players[i].guess >= clueVlaue - 16 && players[i].guess <= clueVlaue - 10) || (players[i].guess >= clueVlaue + 9 && players[i].guess <= clueVlaue + 16) )
       
       if(i != playersTurn){
 
@@ -183,7 +185,6 @@ wss.on('connection', ws => {
 
     }
 
-    
     
     players[playersTurn].points += cluegiverGainedPoints
     if(cluegiverGainedPoints == 0){

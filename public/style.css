@@ -30,7 +30,15 @@
   cursor: pointer;
 }
 
-.body {
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+}
+
+body {
+    background: rgb(122, 40, 122);
   display: flex;
   flex-direction: column;
 }
@@ -48,114 +56,109 @@
   display: none;
   position: relative;
   /* contains all absolute elements */
-  width: 240px;
+  width: 300px;
   /* same as your gear size */
-  height: 240px;
+  height: 300px;
   flex-shrink: 0;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-
 }
 
 
 .gear {
-  position: absolute;
-  height: 240px;
-  width: 240px;
-  border-radius: 120px;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
 }
 
 .gear.one {
-  top: 0;
-  left: 0;
-  transform: scale(1.2);
+    top: 20%;
+    left: 16.6%;
+    transform: scale(1.2);
 }
 
 
 
 
 .gear-inner {
-  position: relative;
-  height: 100%;
-  width: 100%;
-  background-color: #3cf0ed00;
-  border-radius: 120px;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    background-color: #3cf0ed00;
+    border-radius: 50%;
 }
 
 
 @keyframes counter-clockwise {
-  0% {
-    transform: rotate(0deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
 
-  100% {
-    transform: rotate(-360deg)
-  }
+    100% {
+        transform: rotate(-360deg)
+    }
 }
 
 .gear.one .gear-inner {
-  animation: counter-clockwise 4s forwards;
+    animation: "";
 }
 
 .gear-inner .bar {
-  background-color: #fff0ad;
-  height: 8px;
-  width: 260px;
-  position: absolute;
-  left: 50%;
-  margin-left: -130px;
-  top: 50%;
-  margin-top: -4px;
-  border-radius: 4px;
-  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2), inset 1px 2px 1px white,
-    2px -1px 1px rgba(0, 0, 0, 0.2), -1px 0px 1px rgba(0, 0, 0, 0.2);
+    background-color: #fff0ad;
+    height: 8px;
+    width: 108.3%;
+    position: absolute;
+    left: 50%;
+    margin-left: -54.16%;
+    top: 50%;
+    margin-top: -1.6%;
+    border-radius: 4px;
+    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2), inset 1px 2px 1px white,
+        2px -1px 1px rgba(0, 0, 0, 0.2), -1px 0px 1px rgba(0, 0, 0, 0.2);
+    
+
 }
 
 
 
 
 .gear-inner .bar:nth-child(2) {
-  transform: rotate(18deg);
+    transform: rotate(18deg);
 }
 
 .gear-inner .bar:nth-child(3) {
-  transform: rotate(36deg);
+    transform: rotate(36deg);
 }
 
 .gear-inner .bar:nth-child(4) {
-  transform: rotate(54deg);
+    transform: rotate(54deg);
 }
 
 .gear-inner .bar:nth-child(5) {
-  transform: rotate(72deg);
+    transform: rotate(72deg);
 }
 
 .gear-inner .bar:nth-child(6) {
-  transform: rotate(90deg);
+    transform: rotate(90deg);
 }
 
 .gear-inner .bar:nth-child(7) {
-  transform: rotate(108deg);
+    transform: rotate(108deg);
 }
 
 .gear-inner .bar:nth-child(8) {
-  transform: rotate(126deg);
+    transform: rotate(126deg);
 }
 
 .gear-inner .bar:nth-child(9) {
-  transform: rotate(144deg);
+    transform: rotate(144deg);
 }
 
 .gear-inner .bar:nth-child(10) {
-  transform: rotate(162deg);
+    transform: rotate(162deg);
 }
 
 .gear-inner .bar:nth-child(11) {
-  transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
 
@@ -164,399 +167,133 @@
 
 
 @keyframes reveal {
-  0% {
-    transform: rotate(0deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
 
-  100% {
-    transform: rotate(-180deg)
-  }
+    100% {
+        transform: rotate(-180deg)
+    }
 }
 
 
 .circle {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  position: absolute;
-  /* allows you to move them freely */
-  left: 50px;
+    width: 41.6%;
+    height: 41.6%;
+    border-radius: 50%;
+    position: absolute;
+    /* allows you to move them freely */
+    left: 20.8%;
 }
 
 .circle1 {
-  background-color: rgb(2, 3, 46);
-  width: 240px;
-  height: 120px;
-  border-radius: 120px 120px 0 0;
-  z-index: 5;
-  left: 0px;
-  top: 120px;
-  transform: rotate(180deg);
+    background-color: rgb(2, 3, 46);
+    width: 100%;
+    height: 50%;
+    border-radius: 150px 150px 0 0; /*change */
+    z-index: 5;
+    left: 0px;
+    top: 50%;
+    transform: rotate(180deg);
 
 
 }
 
 .circle2 {
-  transform-origin: bottom center;
-  background-color: rgb(112, 179, 206);
-  width: 240px;
-  height: 120px;
-  border-radius: 120px 120px 0 0;
-  z-index: 4;
-  left: 0px;
-  animation: reveal 4s forwards;
+    transform-origin: bottom center;
+    background-color: rgb(112, 179, 206);
+    width: 100%;
+    height: 50%;
+    border-radius: 150px 150px 0 0; /*change */ 
+    z-index: 4;
+    left: 0px;
+    animation: "";
 
 }
 
 .circle3 {
-  background-color: transparent;
-  border: 4px solid rgb(2, 3, 46);
-  width: 240px;
-  height: 120px;
-  border-radius: 120px 120px 0 0;
-  z-index: 5;
-  left: 0px;
+    background-color: transparent;
+    border: 4px solid rgb(2, 3, 46);
+    width: 100%;
+    height: 50%;
+    border-radius: 150px 150px 0 0; /*change */
+    z-index: 5;
+    left: 0px;
 
 
 }
 
 .circle4 {
-  background-color: #fff0ad;
-  width: 240px;
-  height: 240px;
-  z-index: 2;
-  left: 0px;
+    background-color: #fff0ad;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    left: 0px;
 
 
 }
 
 
 .wedge {
-  width: 240px;
-  height: 240px;
-  position: absolute;
-  z-index: 3;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 3;
 
-  clip-path: polygon(50% 50%,
-      /* center */
-      1% 53%,
-      /* left center */
-      1% 47%
-      /* slightly up from left center to form the wedge edge */
-    );
-  transform-origin: 50% 50%;
-  /* now 0deg = left */
+    clip-path: polygon(50% 50%,
+            /* center */
+            1% 53%,
+            /* left center */
+            1% 47%
+            /* slightly up from left center to form the wedge edge */
+        );
+    transform-origin: 50% 50%;
+    /* now 0deg = left */
 }
 
 .wedge1 {
-  background: rgb(112, 179, 206);
-  transform: rotate(46deg);
+    background: rgb(112, 179, 206);
+    transform: rotate(46deg);
 }
 
 .wedge2 {
-  background: rgb(242, 118, 46);
-  transform: rotate(53deg);
+    background: rgb(242, 118, 46);
+    transform: rotate(53deg);
 }
 
 
 .wedge3 {
-  background: rgb(242, 118, 46);
-  transform: rotate(39deg);
+    background: rgb(242, 118, 46);
+    transform: rotate(39deg);
 }
 
 .wedge4 {
-  background: rgb(242, 178, 13);
-  transform: rotate(33deg);
+    background: rgb(242, 178, 13);
+    transform: rotate(33deg);
 }
 
 .wedge5 {
-  background: rgb(242, 178, 13);
-  transform: rotate(59deg);
+    background: rgb(242, 178, 13);
+    transform: rotate(59deg);
 }
 
 .pin {
-  background-color: #f11010;
-  height: 2px;
-  width: 120px;
+    background-color: #f11010;
+    height: 2px;
+    width: 50%;
 
-  position: absolute;
-  top: 50%;
-  left: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
 
 
-  /* pivot at the LEFT END of the horizontal line */
-  transform-origin: 0% 50%;
-  /* left center */
+    /* pivot at the LEFT END of the horizontal line */
+    transform-origin: 0% 50%;
+    /* left center */
 
-  /* move left end to circle center */
-  transform: translate(0, -50%) rotate(270deg);
+    /* move left end to circle center */
+    transform: translate(0, -50%) rotate(270deg);
 
-  z-index: 6;
-
-}
-
-body {
-  display: flex;
-  flex-direction: column;
-  background: rgb(91, 30, 198);
-}
-
-.spinWheel {
-  display: flex;
-  /* or grid */
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  /* space between wheels if multiple */
-  flex-wrap: wrap;
-}
-
-.wrapper {
-  position: relative;
-  /* contains all absolute elements */
-  width: 240px;
-  /* same as your gear size */
-  height: 240px;
-  flex-shrink: 0;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-
-}
-
-
-.gear {
-  position: absolute;
-  height: 240px;
-  width: 240px;
-  border-radius: 120px;
-}
-
-.gear.one {
-  top: 0;
-  left: 0;
-  transform: scale(1.2);
-}
-
-
-
-
-.gear-inner {
-  position: relative;
-  height: 100%;
-  width: 100%;
-  background-color: #3cf0ed00;
-  border-radius: 120px;
-}
-
-
-@keyframes counter-clockwise {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(-360deg)
-  }
-}
-
-.gear.one .gear-inner {
-  animation: counter-clockwise 4s forwards;
-}
-
-.gear-inner .bar {
-  background-color: #fff0ad;
-  height: 8px;
-  width: 260px;
-  position: absolute;
-  left: 50%;
-  margin-left: -130px;
-  top: 50%;
-  margin-top: -4px;
-  border-radius: 4px;
-  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2), inset 1px 2px 1px white,
-    2px -1px 1px rgba(0, 0, 0, 0.2), -1px 0px 1px rgba(0, 0, 0, 0.2);
-}
-
-
-
-
-.gear-inner .bar:nth-child(2) {
-  transform: rotate(18deg);
-}
-
-.gear-inner .bar:nth-child(3) {
-  transform: rotate(36deg);
-}
-
-.gear-inner .bar:nth-child(4) {
-  transform: rotate(54deg);
-}
-
-.gear-inner .bar:nth-child(5) {
-  transform: rotate(72deg);
-}
-
-.gear-inner .bar:nth-child(6) {
-  transform: rotate(90deg);
-}
-
-.gear-inner .bar:nth-child(7) {
-  transform: rotate(108deg);
-}
-
-.gear-inner .bar:nth-child(8) {
-  transform: rotate(126deg);
-}
-
-.gear-inner .bar:nth-child(9) {
-  transform: rotate(144deg);
-}
-
-.gear-inner .bar:nth-child(10) {
-  transform: rotate(162deg);
-}
-
-.gear-inner .bar:nth-child(11) {
-  transform: rotate(180deg);
-}
-
-
-
-
-
-
-@keyframes reveal {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(-180deg)
-  }
-}
-
-
-.circle {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  position: absolute;
-  /* allows you to move them freely */
-  left: 50px;
-}
-
-.circle1 {
-  background-color: rgb(2, 3, 46);
-  width: 240px;
-  height: 120px;
-  border-radius: 120px 120px 0 0;
-  z-index: 5;
-  left: 0px;
-  top: 120px;
-  transform: rotate(180deg);
-
-
-}
-
-.circle2 {
-  transform-origin: bottom center;
-  background-color: rgb(112, 179, 206);
-  width: 240px;
-  height: 120px;
-  border-radius: 120px 120px 0 0;
-  z-index: 4;
-  left: 0px;
-  animation: reveal 4s forwards;
-
-}
-
-.circle3 {
-  background-color: transparent;
-  border: 4px solid rgb(2, 3, 46);
-  width: 240px;
-  height: 120px;
-  border-radius: 120px 120px 0 0;
-  z-index: 5;
-  left: 0px;
-
-
-}
-
-.circle4 {
-  background-color: #fff0ad;
-  width: 240px;
-  height: 240px;
-  z-index: 2;
-  left: 0px;
-
-
-}
-
-
-.wedge {
-  width: 240px;
-  height: 240px;
-  position: absolute;
-  z-index: 3;
-
-  clip-path: polygon(50% 50%,
-      /* center */
-      1% 53%,
-      /* left center */
-      1% 47%
-      /* slightly up from left center to form the wedge edge */
-    );
-  transform-origin: 50% 50%;
-  /* now 0deg = left */
-}
-
-.wedge1 {
-  background: rgb(112, 179, 206);
-  transform: rotate(46deg);
-}
-
-.wedge2 {
-  background: rgb(242, 118, 46);
-  transform: rotate(53deg);
-}
-
-
-.wedge3 {
-  background: rgb(242, 118, 46);
-  transform: rotate(39deg);
-}
-
-.wedge4 {
-  background: rgb(242, 178, 13);
-  transform: rotate(33deg);
-}
-
-.wedge5 {
-  background: rgb(242, 178, 13);
-  transform: rotate(59deg);
-}
-
-.pin {
-  background-color: #f11010;
-  height: 2px;
-  width: 120px;
-
-  position: absolute;
-  top: 50%;
-  left: 50%;
-
-
-  /* pivot at the LEFT END of the horizontal line */
-  transform-origin: 0% 50%;
-  /* left center */
-
-  /* move left end to circle center */
-  transform: translate(0, -50%) rotate(270deg);
-
-  z-index: 6;
+    z-index: 6;
 
 }
