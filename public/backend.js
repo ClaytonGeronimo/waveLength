@@ -1,7 +1,6 @@
 const socket = new WebSocket(`ws://${location.host}`);
 //const socket = new WebSocket(`wss://actinometrical-unseparately-lennox.ngrok-free.dev/`);
 
-
 socket.onopen = () => {
   console.log('Connected to server');
 };
@@ -30,6 +29,9 @@ socket.addEventListener('message', event => {
   if (data.type == 'updateClueGiver') {
     updateClueGiver(data.points, data.username, data.whosTurn)
 
+  }
+  if(data.type == 'Prompts'){
+    displayCards(data.Prompt)
   }
   if (data.type == 'updateGuessers') {
     updateGuessers(data.points, data.username, data.whosTurn)
@@ -72,12 +74,11 @@ function displayPlayers(data) {
 
 
 //displays slider onto the host screen fro everyone to see 
-function addSlider(value = 50, color = 'yes') {
+function addSlider(value) {
   const targetDiv = document.querySelector('.wrapper');
-  const wheelCover = document.querySelector('.circle2')
-  wheelCover.style.transform = 'rotate(0deg)'
+  const pin = document.querySelector('.pin');
   targetDiv.style.display = "block"
-  console.log(value)
+  pin.style.transform = "translate(0, -50%) rotate(270deg)"
   sliderColor(value)
   
 }
@@ -106,8 +107,8 @@ function clearplayers() {
 
 // removes register buttons
 function removeHostLogin() {
-  const targetDiv = document.getElementById('login');
-  targetDiv.innerHTML = ''
+  const targetDiv = document.querySelector('.loginholder');
+  targetDiv.remove()
 }
 
 //adds start button for the host 
@@ -128,7 +129,7 @@ function AddStartButton() {
 const pin = document.querySelector('.pin')
 const circle = document.querySelector('.circle4')
 let isRotating = false
-let angleDeg = null
+let angleDeg = 90
 
 document.addEventListener('mousedown', (e) => {
   if (e.target.closest(".pin")) {
@@ -147,7 +148,6 @@ const rotatePin = (e) => {
     let deltaX = e.clientX - centerX
     let deltaY = e.clientY - centerY
 
-    //if (Math.abs(deltaX) < 1 && Math.abs(deltaY) < 1) return;
 
     let agnleRad = Math.atan2(deltaY, deltaX)
     angleDeg = (agnleRad * 180) / Math.PI
@@ -155,7 +155,6 @@ const rotatePin = (e) => {
     if (angleDeg < 0) angleDeg += 360;
     if (angleDeg >= 180 && angleDeg <= 360) {
       pin.style.transform = `translate(0, -50%) rotate(${angleDeg}deg)`
-      console.log(angleDeg - 180)
     }
 
   }
@@ -175,9 +174,7 @@ function addConfirmButtn() {
   targetDiv.appendChild(confirmButton)
 
   document.getElementById("confirmButton").addEventListener('click', () => {
-    wheelCover.style.animation = "reveal 3s forwards"
-    socket.send(JSON.stringify({ type: "guesedVal", value: Math.floor(angleDeg - 180) }))
-    console.log(angleDeg - 180)
+    socket.send(JSON.stringify({ type: "guesedVal", value: Math.abs(Math.floor(angleDeg - 180)) }))
     confirmButton.remove()
     waitingScreen()
   });
@@ -236,21 +233,30 @@ function updateGuessers(points, player, playersTurn) {
 
 //update cluegiver screen
 function updateClueGiver(points, player, playersTurn) {
-  randValue = Math.floor(Math.random() * 181 )
+  const wheelCover = document.querySelector('.circle2')
+  wheelCover.style.animation = ""
+  randValue = 1//Math.floor(Math.random() * 181 )
+  socket.send(JSON.stringify({ type: "ClueValue", value: randValue }))
+  socket.send(JSON.stringify({type: 'GetPrompts'}))
   addSlider(randValue)
   updateStatusBar(points, player, playersTurn)
   addSpinButton()
   addReadyButton(playersTurn)
-  socket.send(JSON.stringify({ type: "ClueValue", value: randValue }))
+  displayCards(randValue)
 
 }
+function displayCards(prompt){
+  const card1 = document.querySelector('.card1')
+  const card2 = document.querySelector('.card2')
 
+  card1.innerHTML = prompt[0]
+  card2.innerHTML = prompt[1]
+}
 function addSpinButton(){
   const targetDiv = document.getElementById('body')
   const spinBttn = document.createElement('button')
   const wheel = document.querySelector('.gear-inner')
   const wheelCover = document.querySelector('.circle2')
-
   spinBttn.innerHTML = 'Spin'
 
   targetDiv.appendChild(spinBttn)
@@ -311,12 +317,23 @@ function evaluationScreen(points, message, myTurn) {
   targetTag.innerHTML = `Points: ${points}`
   const displayMessage = document.getElementById('playerNames')
   displayMessage.innerHTML = message
-
+  const wheelCover = document.querySelector('.circle2')
+  const wheelWrapper = document.querySelector('.wrapper');
+  const wheel = document.querySelector('.gear-inner')
+  
+  wheelCover.style.animation = "reveal 3s forwards";
+  console.log("hello1")
   if (myTurn) {
-    setTimeout(() => { socket.send(JSON.stringify({ type: "startGame" })); }, 2000);
+    setTimeout(() => { 
+      socket.send(JSON.stringify({ type: "startGame" }));
+       wheelCover.style.animation = "";
+       wheel.style.animation = ""}, 3000);
+  }
+  else{
+    setTimeout(() => {
+      wheelCover.style.animation = "";
+      wheelWrapper.style.display = "none"
+    }, 3000);
   }
 
 }
-
-
-

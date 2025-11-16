@@ -5,10 +5,24 @@ const app = express();
 const server = require('http').createServer(app);
 const WebSocket = require('ws');
 const path = require('path');
+const fs = require('fs');
+const { json } = require('stream/consumers');
+
+const filePath = 'public/Prompts.txt'
 
 const wss = new WebSocket.Server({ server });
+let lines = null
 
 
+fs.readFile(filePath,'utf8', (err,data) => {
+  if(err){
+    console.error("error reading file", err)
+    return
+  }
+  
+  lines = data.split(/\r?\n/)
+
+})
 
 
 
@@ -42,7 +56,9 @@ wss.on('connection', ws => {
     }
     if(data.type == 'ClueValue'){
       clueVlaue = data.value
-      console.log(clueVlaue)
+    }
+    if(data.type == 'GetPrompts'){
+      ws.send(JSON.stringify({type: 'Prompts', Prompt: JSON.parse(lines[clueVlaue - 1]) }))
     }
     if(data.type == 'guesedVal'){
       updateGuess(data.value)
@@ -126,10 +142,8 @@ wss.on('connection', ws => {
   }
   
   function updateGuess(value){
-    console.log(value)
     for(let i = 0; i < players.length; i++){
       if(ws == players[i].clientID){
-        console.log("hello",players[i].guess)
         players[i].guess = value
         players[i].guessed = true
         if(checkAllGuessed()){
@@ -197,7 +211,7 @@ wss.on('connection', ws => {
     if(playersTurn == players.length-1){
         playersTurn = 0
       }
-      playersTurn += 1
+    playersTurn += 1
     
   }
 
