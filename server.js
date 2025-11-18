@@ -174,20 +174,24 @@ wss.on('connection', ws => {
       let twoPoints = ((players[i].guess <= clueVlaue -3 && players[i].guess >= clueVlaue - 8) || (players[i].guess >= clueVlaue + 5 && players[i].guess < clueVlaue + 10))
       let onePoint = ((players[i].guess >= clueVlaue - 16 && players[i].guess <= clueVlaue - 10) || (players[i].guess >= clueVlaue + 9 && players[i].guess <= clueVlaue + 16) )
       
-      if(i != playersTurn){
+      if(i != playersTurn && i != 0){
 
         if(threePoints || twoPoints || onePoint){
           if(threePoints){
               players[i].points += 3
               cluegiverGainedPoints += 1
+              console.log("hello1",players[i].points,players[i].username)
+              
             }
             else if(twoPoints){
               players[i].points += 2
               cluegiverGainedPoints += 1
+              console.log("hello2")
             }
             else if(onePoint){
               players[i].points += 1
               cluegiverGainedPoints += 1
+              console.log("hello3")
             }
             players[i].clientID.send(JSON.stringify({type: 'allGuessed',points: players[i].points, message: "Your Safe!", myTurn: false}))
           }
@@ -221,10 +225,18 @@ wss.on('connection', ws => {
     }
   }
 
+  function removePlayer(){
+    for(let i = 0; i < players.length; i++ ){
+      if(players[i].clientID == ws){
+        players.splice(i,1)
+      }
+    }
+  }
   
 
   ws.on('close', () => {
     console.log('🔴 Client disconnected');
+    removePlayer()
   });
 });
 app.use(express.static(path.join(__dirname, 'public')));

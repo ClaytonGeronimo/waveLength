@@ -1,5 +1,5 @@
-const socket = new WebSocket(`ws://${location.host}`);
-//const socket = new WebSocket(`wss://actinometrical-unseparately-lennox.ngrok-free.dev/`);
+//const socket = new WebSocket(`ws://${location.host}`);
+const socket = new WebSocket(`wss://actinometrical-unseparately-lennox.ngrok-free.dev/`);
 
 socket.onopen = () => {
   console.log('Connected to server');
@@ -64,6 +64,10 @@ function newUser() {
 // updates the player list everytime a new player joins (only on the host screen)
 function displayPlayers(data) {
   const targetDiv = document.getElementById('playerNames');
+  const logo = document.querySelector('.logo')
+  const body = document.querySelector('body')
+  body.style.background = 'rgb(6, 77, 87)'
+  logo.id = 'lobbyLogo'
   clearplayers()
   data.forEach(player => {
     const newh1 = document.createElement('h1');
@@ -75,9 +79,9 @@ function displayPlayers(data) {
 
 //displays slider onto the host screen fro everyone to see 
 function addSlider(value) {
-  const targetDiv = document.querySelector('.wrapper');
+  const targetDiv = document.querySelector('.spinWheel');
   const pin = document.querySelector('.pin');
-  targetDiv.style.display = "block"
+  targetDiv.style.display = "flex"
   pin.style.transform = "translate(0, -50%) rotate(270deg)"
   sliderColor(value)
   
@@ -114,13 +118,16 @@ function removeHostLogin() {
 //adds start button for the host 
 function AddStartButton() {
   const targetDiv = document.getElementById('body');
+  const buttonDiv = document.createElement('div')
+  buttonDiv.id = "startbuttonWrapper"
   const startButton = document.createElement('button')
   startButton.type = "submit"
   startButton.id = "startButton"
   startButton.innerHTML = "START GAME"
-  targetDiv.appendChild(startButton)
+  buttonDiv.appendChild(startButton)
+  targetDiv.appendChild(buttonDiv)
   document.getElementById("startButton").addEventListener('click', () => {
-    startButton.remove()
+    buttonDiv.remove()
     startGame()
   });
 
@@ -272,7 +279,7 @@ function addSpinButton(){
 function addReadyButton(playersTurn) {
   const targetDiv = document.getElementById('body')
   const readyBttn = document.createElement('button')
-  const wheel = document.querySelector('.wrapper');
+  const wheel = document.querySelector('.spinWheel');
   readyBttn.id = 'readyBttn'
   readyBttn.innerHTML = 'Ready'
 
@@ -288,6 +295,7 @@ function addReadyButton(playersTurn) {
 // creates a countdown with specified time, text and data to send
 function countDown(time, element, text, data, str = '') {
   const targetTag = document.getElementById(element)
+  targetTag.style.display = 'block'
   let timeLeft = time
   const timer = setInterval(function () {
     timeLeft -= 1
@@ -298,6 +306,7 @@ function countDown(time, element, text, data, str = '') {
       targetTag.innerHTML = str
 
       setTimeout(() => { socket.send(JSON.stringify(data)); }, 2000);
+      targetTag.style.display = 'none'
     }
 
   }, 1000)
@@ -318,7 +327,7 @@ function evaluationScreen(points, message, myTurn) {
   const displayMessage = document.getElementById('playerNames')
   displayMessage.innerHTML = message
   const wheelCover = document.querySelector('.circle2')
-  const wheelWrapper = document.querySelector('.wrapper');
+  const spinWheel = document.querySelector('.spinWheel');
   const wheel = document.querySelector('.gear-inner')
   
   wheelCover.style.animation = "reveal 3s forwards";
@@ -332,7 +341,7 @@ function evaluationScreen(points, message, myTurn) {
   else{
     setTimeout(() => {
       wheelCover.style.animation = "";
-      wheelWrapper.style.display = "none"
+      spinWheel.style.display = "none"
     }, 3000);
   }
 
