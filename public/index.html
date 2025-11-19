@@ -3,14 +3,17 @@
 <head>
     <title>WAVELENGTH</title>
     <link rel="stylesheet" href="style.css">
+    <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet'>
 </head>
 <div class='body' id="body" style="position: relative;">
     <div class = 'logo' id="logo">
-        <h1 style="text-align: center;">WAVELENGTH</h1>
+        <h1 class = 'logo logo2'>WAVELENGTH</h1>
     </div>
 
-    <div id="statusBar"></div>
-    <h1 id="WhosTurn"></h1>
+    <div id="statusBar">
+        <div id="statusWrapper"></div>
+    </div>
+    <div><h1 id="WhosTurn"></h1></div>
 
     <div class = loginholder>
         <div id="login">
@@ -59,6 +62,8 @@
             <div class = 'card card2'></div>
         </div>
     </div>
+
+    <div id = 'buttonHolders'></div>
 
 </div>
 <script src="backend.js"></script>

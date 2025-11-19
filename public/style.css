@@ -1,3 +1,5 @@
+@import url('https://fonts.cdnfonts.com/css/arcade-classic');
+
 .slider {
   -webkit-appearance: none;
   width: 100%;
@@ -37,7 +39,7 @@
 
 }
 body{
-    background-image: url("../images/DesktopLoginBackground.png");
+    background-image: url("../images/snow.gif"),url("../images/Christmas_Lights_Revised.gif"),url("../images/DesktopLoginBackground.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -50,23 +52,38 @@ body{
 
 
 
-#logo{
-    margin-top: 10%;
-    margin-bottom:  10%;
+.logo{
     font-size: 40px;
     color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+}
+.logo2{
+    text-align: center;
+    margin-bottom: 2%;
+    font-family: 'Anton', sans-serif;
+    background: rgb(212, 104, 42);
+    border: 8px solid rgb(209, 146, 131);
+    font-size: 100px;
+    letter-spacing: 10px;
 }
 #lobbyLogo{
     background-image: url("../images/LobbyLogoBackground.png");
-    height: 15%;
+    height: 22%;
     padding-top: 2%;
     color: white;
     border: 8px solid rgb(0, 0, 0);
 }
 
+h1{
+    color: white;
+}
+
 .spinWheel {
   display: none;
-  height: 400px;
+  height:800px;
   width: 100%;
   justify-content: center;
   align-items: center;
@@ -75,7 +92,8 @@ body{
 }
 
 #playerNames{
-    height: 700px;
+    display: none;
+    height: 600px;
 }
 
 .wrapper {
@@ -340,7 +358,7 @@ body{
 .loginholder{
     text-align: center;
     width: 100%;
-    height: 100px;
+    margin-top: 10%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -402,6 +420,7 @@ body{
 }
 
 #startButton{
+    margin: 0%;
     width: 200px;
     height: 50px;
     border-radius: 30px;
@@ -427,7 +446,6 @@ label{
 #startbuttonWrapper{
     text-align: center;
     width: 100%;
-    height: 100px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -436,14 +454,23 @@ label{
 
 @media (max-width: 1000px){
   body{
-        background-image: url("../images/MobileLoginBackground.png");
+        background-image: url("../images/snow.gif"),url("../images/Christmas_Lights_Revised.gif"),url("../images/DesktopLoginBackground.png");
         
     }
     #logo{
-        margin-top: 28%;
-        margin-bottom:  30%;
         font-size: 60px;
         color: white;
+        font-family: 'Anton', sans-serif;
+        margin-top: 50%;
+    }
+    .logo2{
+        text-align: center;
+        font-family: 'Oswald',sans-serif;
+        display: inline-block;
+        background: rgb(212, 104, 42);
+        border: 8px solid rgb(209, 146, 131);
+        font-size: 100px;
+        letter-spacing: 0.5px;
     }
 
     input{
@@ -471,5 +498,88 @@ label{
         font-family: Impact, fantasy;
 
     }
+
+    #lobbyLogo{
+        color: white;
+        border: 8px solid rgb(0, 0, 0);
+        height: 10%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    h1{
+        font-size: 70px;
+    }
+
+    #statusBar{
+        background-image: url("../images/statusbarBackground.png");
+        border-radius: 12px;
+        width: 100%;
+        height: 200px;
+        justify-content: center;
+        align-items: center;
+        display: none;
+        border: 10px solid rgb(43, 43, 43);
+        gap:30%
+    }
+    #statusWrapper{
+        display: flex;
+        gap: 10%
+    }
+
+    #playerName{
+        background: rgb(31, 30, 30);
+        border: 3px solid rgb(43, 43, 43);
+        text-align: center;
+        font-size: 50px;
+    }
+    #playerPoints{
+        background: rgb(31, 30, 30);
+        border: 3px solid rgb(43, 43, 43);
+        text-align: center;
+        font-size: 50px;
+    }
+
+    #spinBttn{
+        width: 400px;
+        height: 100px;
+        border-radius: 30px;
+        border: 6px solid rgb(41, 35, 30);
+        font-size: 60px;
+        background: rgb(198,185,142);
+        font-family: Impact, fantasy;
+        color:white
+        
+    }
+
+    #readyBttn{
+        width: 400px;
+        height: 100px;
+        border-radius: 30px;
+        border: 6px solid rgb(41, 35, 30);
+        font-size: 60px;
+        background: rgb(198,185,142);
+        font-family: Impact, fantasy;
+        color:white
+    }
+    #confirmButton{
+        width: 400px;
+        height: 100px;
+        border-radius: 30px;
+        border: 6px solid rgb(41, 35, 30);
+        font-size: 60px;
+        background: rgb(198,185,142);
+        font-family: Impact, fantasy;
+        color:white
+    }
+
+    #buttonHolders{
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        align-items: center;
+    }
+
         
 }

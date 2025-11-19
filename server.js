@@ -58,7 +58,7 @@ wss.on('connection', ws => {
       clueVlaue = data.value
     }
     if(data.type == 'GetPrompts'){
-      ws.send(JSON.stringify({type: 'Prompts', Prompt: JSON.parse(lines[clueVlaue - 1]) }))
+      ws.send(JSON.stringify({type: 'Prompts', Prompt: null }))//JSON.parse(lines[clueVlaue - 1])
     }
     if(data.type == 'guesedVal'){
       updateGuess(data.value)
@@ -135,7 +135,7 @@ wss.on('connection', ws => {
         client.send(JSON.stringify(data))
       }
       else{
-        const data = {type: 'guessingScreen', clueVlaue: clueVlaue}
+        const data = {type: 'guessingScreen', clueVlaue: clueVlaue, playersTurn: playersTurn}
         client.send(JSON.stringify(data))
       }
     })
@@ -170,28 +170,27 @@ wss.on('connection', ws => {
   function updatepoints(pointsgained){
     let cluegiverGainedPoints = 0
     for(let i = 0; i < players.length; i++){
-      let threePoints = (players[i].guess == clueVlaue || (players[i].guess >= clueVlaue - 2 && players[i].guess <= clueVlaue + 2 ))
-      let twoPoints = ((players[i].guess <= clueVlaue -3 && players[i].guess >= clueVlaue - 8) || (players[i].guess >= clueVlaue + 5 && players[i].guess < clueVlaue + 10))
-      let onePoint = ((players[i].guess >= clueVlaue - 16 && players[i].guess <= clueVlaue - 10) || (players[i].guess >= clueVlaue + 9 && players[i].guess <= clueVlaue + 16) )
+      let threePoints = (players[i].guess == clueVlaue || (players[i].guess >= clueVlaue - 3 && players[i].guess <= clueVlaue + 2 ))
+      let twoPoints = ((players[i].guess < clueVlaue -3 && players[i].guess >= clueVlaue - 9) || (players[i].guess >= clueVlaue + 3 && players[i].guess <= clueVlaue + 8))
+      let onePoint = ((players[i].guess >= clueVlaue - 16 && players[i].guess < clueVlaue - 9) || (players[i].guess > clueVlaue + 8 && players[i].guess <= clueVlaue + 16) )
       
+      if(i==0){
+        players[i].clientID.send(JSON.stringify({type: 'openHostCover'}))
+      }
       if(i != playersTurn && i != 0){
-
         if(threePoints || twoPoints || onePoint){
           if(threePoints){
               players[i].points += 3
               cluegiverGainedPoints += 1
-              console.log("hello1",players[i].points,players[i].username)
               
             }
             else if(twoPoints){
               players[i].points += 2
               cluegiverGainedPoints += 1
-              console.log("hello2")
             }
             else if(onePoint){
               players[i].points += 1
               cluegiverGainedPoints += 1
-              console.log("hello3")
             }
             players[i].clientID.send(JSON.stringify({type: 'allGuessed',points: players[i].points, message: "Your Safe!", myTurn: false}))
           }

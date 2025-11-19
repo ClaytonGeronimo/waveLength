@@ -52,6 +52,15 @@ socket.addEventListener('message', event => {
   if (data.type == 'allGuessed') {
     evaluationScreen(data.points, data.message, data.myTurn)
   }
+  if(data.type == 'openHostCover'){
+    const wheelCover = document.querySelector('.circle2')
+    wheelCover.style.animation = "reveal 3s forwards";
+    const spinWheel = document.querySelector('.spinWheel');
+    setTimeout(() => {
+      wheelCover.style.animation = "";
+      spinWheel.style.display = "none"
+    }, 5000);
+  }
 })
 
 // gets the username inputed by the user and sends it to the server to add to the list of other players
@@ -64,16 +73,31 @@ function newUser() {
 // updates the player list everytime a new player joins (only on the host screen)
 function displayPlayers(data) {
   const targetDiv = document.getElementById('playerNames');
+  targetDiv.style.display = "block"
+  updateLogo()
+
+
+
+
+  clearplayers()
+  data.forEach(player => {
+    let randomLeft = Math.floor(Math.abs(Math.random()*window.innerWidth-100))
+    let randomTop = Math.floor(Math.abs(Math.random()*((window.innerHeight-100)-200) + 200))
+    const playerDiv = document.createElement('div')
+    playerDiv.style.cssText = `position: absolute; left: ${randomLeft}px; top: ${randomTop}px;`;
+    const newh1 = document.createElement('h1');
+    newh1.textContent = `${player.username}`;
+    playerDiv.appendChild(newh1)
+    targetDiv.appendChild(playerDiv)
+  })
+}
+
+function updateLogo(){
+  const targetDiv = document.getElementById('playerNames');
   const logo = document.querySelector('.logo')
   const body = document.querySelector('body')
   body.style.background = 'rgb(6, 77, 87)'
   logo.id = 'lobbyLogo'
-  clearplayers()
-  data.forEach(player => {
-    const newh1 = document.createElement('h1');
-    newh1.textContent = `${player.username}: `;
-    targetDiv.appendChild(newh1)
-  })
 }
 
 
@@ -112,7 +136,7 @@ function clearplayers() {
 // removes register buttons
 function removeHostLogin() {
   const targetDiv = document.querySelector('.loginholder');
-  targetDiv.remove()
+  targetDiv.style.display = 'none'
 }
 
 //adds start button for the host 
@@ -135,25 +159,36 @@ function AddStartButton() {
 
 const pin = document.querySelector('.pin')
 const circle = document.querySelector('.circle4')
+const circle3 = document.querySelector('.circle3')
 let isRotating = false
 let angleDeg = 90
 
-document.addEventListener('mousedown', (e) => {
-  if (e.target.closest(".pin")) {
-    isRotating = true
+const getCoords = (e) => {
+  if (e.touches) {
+    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  } else {
+    return { x: e.clientX, y: e.clientY };
   }
+};
 
-})
+const startRotate = (e) => {
+  if (e.target.closest(".circle3")) {
+    isRotating = true;
+  }
+};
 
-const rotatePin = (e) => {
-  if (isRotating) {
-    let knobX = circle.getBoundingClientRect()
+const rotateKnob = (e) => {
+  if (!isRotating) return;
+  e.preventDefault();
+  let knobX = circle.getBoundingClientRect()
+
+  const {x,y} = getCoords(e)
 
     let centerX = knobX.left + knobX.width / 2;
     let centerY = knobX.top + knobX.height / 2;
 
-    let deltaX = e.clientX - centerX
-    let deltaY = e.clientY - centerY
+    let deltaX = x - centerX
+    let deltaY = y - centerY
 
 
     let agnleRad = Math.atan2(deltaY, deltaX)
@@ -162,17 +197,28 @@ const rotatePin = (e) => {
     if (angleDeg < 0) angleDeg += 360;
     if (angleDeg >= 180 && angleDeg <= 360) {
       pin.style.transform = `translate(0, -50%) rotate(${angleDeg}deg)`
+      console.log(Math.abs(Math.floor(angleDeg - 180)))
     }
+};
 
-  }
-}
+// Stop rotating
+const stopRotate = () => {
+  isRotating = false;
+};
 
 
-document.addEventListener('mousemove', rotatePin)
-document.addEventListener('mouseup', () => { isRotating = false })
+// Mouse events
+document.addEventListener("mousedown", startRotate);
+document.addEventListener("mousemove", rotateKnob);
+document.addEventListener("mouseup", stopRotate);
+
+// Touch events
+document.addEventListener("touchstart", startRotate);
+document.addEventListener("touchmove", rotateKnob);
+document.addEventListener("touchend", stopRotate);
 
 function addConfirmButtn() {
-  const targetDiv = document.getElementById("body")
+  const targetDiv = document.getElementById("buttonHolders")
   const slider = document.getElementById("myRange")
   const confirmButton = document.createElement("button")
   const wheelCover = document.querySelector('.circle2')
@@ -198,7 +244,7 @@ function startGame() {
 function WhosTurnIsITScreen(data, myTurn) {
   const targetTag = document.getElementById('WhosTurn');
   const playerNames = document.getElementById('playerNames')
-  playerNames.innerHTML = ''
+  playerNames.style.display = 'none'
   targetTag.innerHTML = `${data} turn `
 
 
@@ -211,25 +257,18 @@ function clearwhosTurn() {
 
 function updateStatusBar(points, player, playersTurn) {
   clearwhosTurn()
-  const targetDiv = document.getElementById('statusBar')
-  targetDiv.innerHTML = ""
+  const statusbar = document.getElementById('statusBar')
+  const targetDiv = document.getElementById('statusWrapper')
+  statusbar.style.display = 'flex'
+  statusWrapper.innerHTML = ""
   const username = document.createElement('h1')
-  username.id = "playerName"
   const playerPoints = document.createElement('h1')
+  username.id = "playerName"
   playerPoints.id = "playerPoints"
-  const clueGiver = document.createElement('h1')
-  clueGiver.id = "clueGiver"
-  if (player == playersTurn) {
-    clueGiver.innerHTML = `ClueGiver: You`
-  }
-  else {
-    clueGiver.innerHTML = `ClueGiver: ${playersTurn}`
-  }
-  username.innerHTML = `user: ${player}`
-  playerPoints.innerHTML = `Points: ${points}`
+  username.innerHTML = `USER: ${player}`
+  playerPoints.innerHTML = `POINTS: ${points}`
   targetDiv.appendChild(username)
   targetDiv.appendChild(playerPoints)
-  targetDiv.appendChild(clueGiver)
 }
 
 
@@ -242,13 +281,12 @@ function updateGuessers(points, player, playersTurn) {
 function updateClueGiver(points, player, playersTurn) {
   const wheelCover = document.querySelector('.circle2')
   wheelCover.style.animation = ""
-  randValue = 1//Math.floor(Math.random() * 181 )
+  randValue = 90//Math.floor(Math.random() * 181 )
   socket.send(JSON.stringify({ type: "ClueValue", value: randValue }))
   socket.send(JSON.stringify({type: 'GetPrompts'}))
   addSlider(randValue)
   updateStatusBar(points, player, playersTurn)
-  addSpinButton()
-  addReadyButton(playersTurn)
+  addSpinButton(playersTurn)
   displayCards(randValue)
 
 }
@@ -259,9 +297,10 @@ function displayCards(prompt){
   card1.innerHTML = prompt[0]
   card2.innerHTML = prompt[1]
 }
-function addSpinButton(){
-  const targetDiv = document.getElementById('body')
+function addSpinButton(playersTurn){
+  const targetDiv = document.getElementById('buttonHolders')
   const spinBttn = document.createElement('button')
+  spinBttn.id = "spinBttn"
   const wheel = document.querySelector('.gear-inner')
   const wheelCover = document.querySelector('.circle2')
   spinBttn.innerHTML = 'Spin'
@@ -271,13 +310,14 @@ function addSpinButton(){
     wheel.style.animation = "counter-clockwise 4s forwards"
     setTimeout(() => {
       wheelCover.style.animation = "reveal 3s forwards";
+      addReadyButton(playersTurn)
     }, 5000);
     spinBttn.remove()
   })
 }
 
 function addReadyButton(playersTurn) {
-  const targetDiv = document.getElementById('body')
+  const targetDiv = document.getElementById('buttonHolders')
   const readyBttn = document.createElement('button')
   const wheel = document.querySelector('.spinWheel');
   readyBttn.id = 'readyBttn'
@@ -306,7 +346,7 @@ function countDown(time, element, text, data, str = '') {
       targetTag.innerHTML = str
 
       setTimeout(() => { socket.send(JSON.stringify(data)); }, 2000);
-      targetTag.style.display = 'none'
+      //targetTag.style.display = 'none'
     }
 
   }, 1000)
@@ -314,10 +354,7 @@ function countDown(time, element, text, data, str = '') {
 // updates the secreen to waiting screen when users enter the game
 function waitingScreen() {
   removeHostLogin()
-  const targetDiv = document.getElementById('playerNames')
-  targetDiv.innerHTML = ''
-  const targetTag = document.getElementById('WhosTurn');
-  targetTag.innerHTML = ''
+  updateLogo()
 
 }
 
