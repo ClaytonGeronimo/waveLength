@@ -81,9 +81,14 @@ h1{
     color: white;
 }
 
+#playerNames{
+    display: none;
+    height: 600px;
+}
+
 .spinWheel {
   display: none;
-  height:800px;
+  height:600px;
   width: 100%;
   justify-content: center;
   align-items: center;
@@ -91,18 +96,15 @@ h1{
   flex-wrap: wrap;
 }
 
-#playerNames{
-    display: none;
-    height: 600px;
-}
+
 
 .wrapper {
   display: block;
   position: relative;
   /* contains all absolute elements */
-  width: 600px;
+  width: 400px;
   /* same as your gear size */
-  height: 600px;
+  height: 400px;
   flex-shrink: 0;
 }
 
@@ -234,7 +236,7 @@ h1{
     background-color: rgb(2, 3, 46);
     width: 100%;
     height: 50%;
-    border-radius: 300px 300px 0 0; /*change */
+    border-radius: 200px 200px 0 0; /*change */
     z-index: 5;
     left: 0px;
     top: 50%;
@@ -249,7 +251,7 @@ h1{
     background-color: rgb(112, 179, 206);
     width: 100%;
     height: 50%;
-    border-radius: 300px 300px 0 0; /*change */ 
+    border-radius: 200px 200px 0 0; /*change */ 
     z-index: 4;
     left: 0px;
     animation: "";
@@ -261,7 +263,7 @@ h1{
     border: 4px solid rgb(2, 3, 46);
     width: 100%;
     height: 50%;
-    border-radius: 300px 300px 0 0; /*change */
+    border-radius: 200px 200px 0 0; /*change */
     z-index: 5;
     left: 0px;
 
@@ -376,10 +378,9 @@ h1{
     text-align: center;
     width: 100%;
     height: 100px;
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
-    display: none;
 }
 .cardWrapper{
     display: flex;
@@ -398,9 +399,11 @@ h1{
 
 .card1{
     background-color: rgb(154,178,97);
+    border: 4px solid rgb(198, 185, 142);
 }
 .card2{
     background-color: rgb(191,136,27);
+    border: 4px solid rgb(198, 185, 142);
 }
 
 #ready{
@@ -417,6 +420,7 @@ h1{
 
 #WhosTurn{
     display: none;
+    text-align: center;
 }
 
 #startButton{
@@ -579,6 +583,154 @@ label{
         justify-content: center;
         width: 100%;
         align-items: center;
+    }
+
+    .spinWheel {
+    display: none;
+    height:800px;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    /* space between wheels if multiple */
+    flex-wrap: wrap;
+    }
+
+
+
+    .wrapper {
+    display: block;
+    position: relative;
+    /* contains all absolute elements */
+    width: 600px;
+    /* same as your gear size */
+    height: 600px;
+    flex-shrink: 0;
+    }
+
+
+    .gear {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        border-radius: 50%;
+    }
+
+    .gear.one {
+        /* top: 20%;
+        left: 16.6%; */
+        transform: scale(1.2);
+    }
+
+
+
+
+    .gear-inner {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        background-color: #3cf0ed00;
+        border-radius: 50%;
+    }
+    .gear-inner .bar {
+        background-color: #fff0ad;
+        height: 16px;
+        width: 108.3%;
+        position: absolute;
+        left: 50%;
+        margin-left: -54.16%;
+        top: 50%;
+        margin-top: -1.6%;
+        border-radius: 4px;
+        box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2), inset 1px 2px 1px white,
+            2px -1px 1px rgba(0, 0, 0, 0.2), -1px 0px 1px rgba(0, 0, 0, 0.2);
+    
+
+    }
+    .circle {
+    width: 41.6%;
+    height: 41.6%;
+    border-radius: 50%;
+    position: absolute;
+    /* allows you to move them freely */
+    left: 20.8%;
+    }
+
+    .circle1 {
+        background-color: rgb(2, 3, 46);
+        width: 100%;
+        height: 50%;
+        border-radius: 300px 300px 0 0; /*change */
+        z-index: 5;
+        left: 0px;
+        top: 50%;
+        transform: rotate(180deg);
+        box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2), inset 1px 10px 1px rgb(2, 0, 19),
+            2px -1px 1px rgba(0, 0, 0, 0.2), -1px 0px 1px rgba(0, 0, 0, 0.2);
+
+    }
+
+    .circle2 {
+        transform-origin: bottom center;
+        background-color: rgb(112, 179, 206);
+        width: 100%;
+        height: 50%;
+        border-radius: 300px 300px 0 0; /*change */ 
+        z-index: 4;
+        left: 0px;
+        animation: "";
+
+    }
+
+    .circle3 {
+        background-color: transparent;
+        border: 4px solid rgb(2, 3, 46);
+        width: 100%;
+        height: 50%;
+        border-radius: 300px 300px 0 0; /*change */
+        z-index: 5;
+        left: 0px;
+
+
+    }
+
+    .circle4 {
+        background-color: #fff0ad;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        left: 0px;
+
+
+    }
+    .circle5 {
+        position: absolute;
+        background-color: #fff0ad;
+        width: 104%;
+        height: 104%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2), inset 1px 2px 1px white,
+            2px -1px 1px rgba(0, 0, 0, 0.2), -1px 0px 1px rgba(0, 0, 0, 0.2);
+    }
+
+
+    .wedge {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        z-index: 3;
+
+        clip-path: polygon(50% 50%,
+                /* center */
+                1% 53%,
+                /* left center */
+                1% 47%
+                /* slightly up from left center to form the wedge edge */
+            );
+        transform-origin: 50% 50%;
+        /* now 0deg = left */
     }
 
         

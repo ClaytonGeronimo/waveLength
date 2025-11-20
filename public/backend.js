@@ -24,7 +24,7 @@ socket.addEventListener('message', event => {
     waitingScreen()
   }
   if (data.type == 'SelectPlayer') {
-    WhosTurnIsITScreen(data.whosTurn, data.myTurn)
+    WhosTurnIsITScreen(data.whosTurn, data.myTurn, data.isHost)
   }
   if (data.type == 'updateClueGiver') {
     updateClueGiver(data.points, data.username, data.whosTurn)
@@ -56,9 +56,11 @@ socket.addEventListener('message', event => {
     const wheelCover = document.querySelector('.circle2')
     wheelCover.style.animation = "reveal 3s forwards";
     const spinWheel = document.querySelector('.spinWheel');
+    const cards = document.querySelector('.cardholders')
     setTimeout(() => {
-      wheelCover.style.animation = "";
+      cards.style.display = "none"
       spinWheel.style.display = "none"
+      wheelCover.style.animation = "";
     }, 5000);
   }
 })
@@ -241,11 +243,19 @@ function startGame() {
 }
 
 //
-function WhosTurnIsITScreen(data, myTurn) {
+function WhosTurnIsITScreen(data, myTurn,isHost) {
   const targetTag = document.getElementById('WhosTurn');
   const playerNames = document.getElementById('playerNames')
   playerNames.style.display = 'none'
   targetTag.innerHTML = `${data} turn `
+
+  if(isHost){
+    randomPrompt = Math.floor(Math.random() * 93 )
+    addSlider(0)
+    socket.send(JSON.stringify({type: 'GetPrompts',line: randomPrompt}))
+    const cardHolder = document.querySelector('.cardholders')
+    cardHolder.style.display = 'flex'
+  }
 
 
 }
@@ -281,13 +291,11 @@ function updateGuessers(points, player, playersTurn) {
 function updateClueGiver(points, player, playersTurn) {
   const wheelCover = document.querySelector('.circle2')
   wheelCover.style.animation = ""
-  randValue = 90//Math.floor(Math.random() * 181 )
+  randValue = Math.floor(Math.random() * 181 )
   socket.send(JSON.stringify({ type: "ClueValue", value: randValue }))
-  socket.send(JSON.stringify({type: 'GetPrompts'}))
   addSlider(randValue)
   updateStatusBar(points, player, playersTurn)
   addSpinButton(playersTurn)
-  displayCards(randValue)
 
 }
 function displayCards(prompt){
@@ -373,13 +381,13 @@ function evaluationScreen(points, message, myTurn) {
     setTimeout(() => { 
       socket.send(JSON.stringify({ type: "startGame" }));
        wheelCover.style.animation = "";
-       wheel.style.animation = ""}, 3000);
+       wheel.style.animation = ""}, 5000);
   }
-  else{
-    setTimeout(() => {
-      wheelCover.style.animation = "";
-      spinWheel.style.display = "none"
-    }, 3000);
-  }
+  // else{
+  //   setTimeout(() => {
+  //     wheelCover.style.animation = "";
+  //     spinWheel.style.display = "none"
+  //   }, 3000);
+  // }
 
 }

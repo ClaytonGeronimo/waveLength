@@ -32,7 +32,6 @@ fs.readFile(filePath,'utf8', (err,data) => {
 const clients = new Map()
 const players = []
 playersTurn = 1
-isHost = true
 clueVlaue = null
 let statusBarUpdated = false;
 
@@ -58,7 +57,7 @@ wss.on('connection', ws => {
       clueVlaue = data.value
     }
     if(data.type == 'GetPrompts'){
-      ws.send(JSON.stringify({type: 'Prompts', Prompt: null }))//JSON.parse(lines[clueVlaue - 1])
+      ws.send(JSON.stringify({type: 'Prompts', Prompt: JSON.parse(lines[data.line - 1]) }))//JSON.parse(lines[clueVlaue - 1])
     }
     if(data.type == 'guesedVal'){
       updateGuess(data.value)
@@ -93,12 +92,18 @@ wss.on('connection', ws => {
 
   function WhosTurnisIT(){
     let CurrPlayer = 0
-    wss.clients.forEach((client) => {
-      
-      const data = {type: 'SelectPlayer', username: players[CurrPlayer].username, whosTurn: players[playersTurn].username, points: players[CurrPlayer].points}
-      client.send(JSON.stringify(data))
+    let host = false;
+
+    for(let i = 0; i < players.length; i++){
+      if(players[i].clientID == clients.get('host')){
+        host = true;
+      }
+      const data = {type: 'SelectPlayer',isHost: host, username: players[CurrPlayer].username, whosTurn: players[playersTurn].username, points: players[CurrPlayer].points}
+      players[i].clientID.send(JSON.stringify(data))
       CurrPlayer += 1
-    });
+      host = false;
+    }
+      
     setTimeout(() => {updateStatusBar()}, 2000);
 
       
@@ -107,38 +112,40 @@ wss.on('connection', ws => {
   function updateStatusBar(){
 
     let CurrPlayer = 0
-    wss.clients.forEach((client) => {
-      if(client != clients.get('host')){
+    for(let i = 0; i < players.length; i++){
+      if(players[i].clientID != clients.get('host')){
         if(CurrPlayer == playersTurn){
           const data = {type: 'updateClueGiver', username: players[CurrPlayer].username, whosTurn: players[playersTurn].username, points: players[CurrPlayer].points}
-          client.send(JSON.stringify(data))
+          players[i].clientID.send(JSON.stringify(data))
         }
         else{
             const data = {type: 'updateGuessers', username: players[CurrPlayer].username, whosTurn: players[playersTurn].username, points: players[CurrPlayer].points}
-            client.send(JSON.stringify(data))
+            players[i].clientID.send(JSON.stringify(data))
         }
       }
       CurrPlayer += 1
-      });
+    }
 
   }
 
   function startGuessing(playersTurn){
-    wss.clients.forEach((client) => {
-      if(client == clients.get(playersTurn))
+
+    for(let i = 0; i < players.length; i++){
+      if(players[i].clientID == clients.get(playersTurn))
       {
         const data = {type: 'ClueGiverisReady'}
-        client.send(JSON.stringify(data))
+        players[i].clientID.send(JSON.stringify(data))
       }
-      else if(client == clients.get('host')){
+      else if(players[i].clientID == clients.get('host')){
         const data = {type: 'hostGuessingScreen', clueVlaue: clueVlaue }
-        client.send(JSON.stringify(data))
+        players[i].clientID.send(JSON.stringify(data))
       }
       else{
         const data = {type: 'guessingScreen', clueVlaue: clueVlaue, playersTurn: playersTurn}
-        client.send(JSON.stringify(data))
+        players[i].clientID.send(JSON.stringify(data))
       }
-    })
+    }
+
   }
   
   function updateGuess(value){
