@@ -69,13 +69,13 @@ wss.on('connection', ws => {
       players.push({username: username, points: 0, guess: null, clientID: ws, guessed: false})
       clients.set(username,ws)
       clients.get('host').send(JSON.stringify({type: 'MainMenu'}))
-      clients.get('host').send(JSON.stringify({type: 'updatePlayerBoard', playerList: players}))
+      clients.get('host').send(JSON.stringify({type: 'updatePlayerBoard', playerName: username}))
     }
     else{
       players.push({username: username, points: 0, guess: null, clientID: ws, guessed: false})
       clients.set(username,ws)
       ws.send(JSON.stringify({type: "waitingScreen"}))
-      clients.get('host').send(JSON.stringify({type: 'updatePlayerBoard' , playerList: players}))
+      clients.get('host').send(JSON.stringify({type: 'updatePlayerBoard' , playerName: username}))
     }
      
   }
@@ -234,7 +234,9 @@ wss.on('connection', ws => {
   function removePlayer(){
     for(let i = 0; i < players.length; i++ ){
       if(players[i].clientID == ws){
+        clients.get('host').send(JSON.stringify({type:'removePlayer', username: players[i].username}))
         players.splice(i,1)
+
       }
     }
   }

@@ -18,7 +18,7 @@ socket.addEventListener('message', event => {
   }
 
   if (data.type == 'updatePlayerBoard') {
-    displayPlayers(data.playerList)
+    displayPlayers(data.playerName)
   }
   if (data.type == 'waitingScreen') {
     waitingScreen()
@@ -63,6 +63,10 @@ socket.addEventListener('message', event => {
       wheelCover.style.animation = "";
     }, 5000);
   }
+
+  if(data.type == 'removePlayer'){
+    removePlayerFromDisplay(data.username)
+  }
 })
 
 // gets the username inputed by the user and sends it to the server to add to the list of other players
@@ -73,32 +77,72 @@ function newUser() {
 }
 
 // updates the player list everytime a new player joins (only on the host screen)
-function displayPlayers(data) {
+function displayPlayers(playerName) {
   const targetDiv = document.getElementById('playerNames');
   targetDiv.style.display = "block"
   updateLogo()
 
+  let colors = ['(154,178,97)','(198,185,142)','(202,146,131)','(207,175,179)','(212,104,42)','(191,136,27)','(41,35,30)','(105,160,128)','(150,179,208)','(242,118,46)','(242,178,13)','(145,210,204)']
+  console.log(window.innerHeight)
 
+  let positions = []
+  let randomColor = Math.floor(Math.abs(Math.random() * (colors.length)))
+  let randomLeft = Math.floor(Math.abs(Math.random()*window.innerWidth-200))
+  let randomTop = Math.floor(Math.abs(Math.random()*(693-293) + 293))
+  let fontsize = Math.floor(Math.abs(Math.random()*(40-10) + 10))
 
+  while (checkpositions(positions,randomTop,randomLeft)){
+    randomLeft = Math.floor(Math.abs(Math.random()*window.innerWidth-200))
+    randomTop = Math.floor(Math.abs(Math.random()*(693-293) + 293))
+  }
+  positions.push([randomTop,randomLeft])
 
-  clearplayers()
-  data.forEach(player => {
-    let randomLeft = Math.floor(Math.abs(Math.random()*window.innerWidth-100))
-    let randomTop = Math.floor(Math.abs(Math.random()*((window.innerHeight-100)-200) + 200))
     const playerDiv = document.createElement('div')
-    playerDiv.style.cssText = `position: absolute; left: ${randomLeft}px; top: ${randomTop}px;`;
+    playerDiv.classList.add('LobbyNames')
+    playerDiv.style.cssText = 
+    `position: absolute; left: ${randomLeft}px;
+    top: ${randomTop}px;
+    background:rgb${colors[randomColor]};
+    font-size: ${fontsize}px;
+    border-radius: ${fontsize}px;`;
+
     const newh1 = document.createElement('h1');
-    newh1.textContent = `${player.username}`;
+    newh1.textContent = `${playerName}`;
     playerDiv.appendChild(newh1)
     targetDiv.appendChild(playerDiv)
+
+}
+function removePlayerFromDisplay(playerName){
+  const playernames = document.querySelectorAll('.LobbyNames')
+  playernames.forEach((item,i) => {
+    if(item.children[0].innerHTML == playerName){
+      item.remove()
+    }
   })
+}
+function checkpositions(arr, top, left){ //arr =[[top,left]]
+  for(let i = 0; i < arr.length; i++){
+    let maxtop = arr[i][0] + 30, mintop = arr[i][0]  - 30
+    let maxleft = arr[i][1] + 30, minleft = arr[i][1] - 30
+    if(inRange(top,maxtop,maxleft) || inRange(left,maxleft,minleft)){
+      return true
+    }
+  }
+  return false
+}
+
+function inRange(num,max,min){
+  if(num<= max && num >= min){
+    return true
+  }
+  return false
 }
 
 function updateLogo(){
   const targetDiv = document.getElementById('playerNames');
   const logo = document.querySelector('.logo')
   const body = document.querySelector('body')
-  body.style.background = 'rgb(6, 77, 87)'
+  body.style.cssText = 'background: radial-gradient(circle, rgb(6, 77, 87) 50%, rgba(4, 52, 58, 1));'
   logo.id = 'lobbyLogo'
 }
 
@@ -160,6 +204,7 @@ function AddStartButton() {
 }
 
 const pin = document.querySelector('.pin')
+const PinCushon = document.querySelector('.PinCushon')
 const circle = document.querySelector('.circle4')
 const circle3 = document.querySelector('.circle3')
 let isRotating = false
@@ -174,7 +219,7 @@ const getCoords = (e) => {
 };
 
 const startRotate = (e) => {
-  if (e.target.closest(".circle3")) {
+  if (e.target.closest(".PinCushon")) {
     isRotating = true;
   }
 };
@@ -199,6 +244,7 @@ const rotateKnob = (e) => {
     if (angleDeg < 0) angleDeg += 360;
     if (angleDeg >= 180 && angleDeg <= 360) {
       pin.style.transform = `translate(0, -50%) rotate(${angleDeg}deg)`
+      PinCushon.style.transform = `translate(0, -50%) rotate(${angleDeg}deg)`
       console.log(Math.abs(Math.floor(angleDeg - 180)))
     }
 };
@@ -216,7 +262,7 @@ document.addEventListener("mouseup", stopRotate);
 
 // Touch events
 document.addEventListener("touchstart", startRotate);
-document.addEventListener("touchmove", rotateKnob);
+document.addEventListener("touchmove", rotateKnob, { passive: false });
 document.addEventListener("touchend", stopRotate);
 
 function addConfirmButtn() {
@@ -302,8 +348,8 @@ function displayCards(prompt){
   const card1 = document.querySelector('.card1')
   const card2 = document.querySelector('.card2')
 
-  card1.innerHTML = prompt[0]
-  card2.innerHTML = prompt[1]
+  card1.children[0].innerHTML = prompt[0]
+  card2.children[0].innerHTML  = prompt[1]
 }
 function addSpinButton(playersTurn){
   const targetDiv = document.getElementById('buttonHolders')
