@@ -292,10 +292,14 @@ function startGame() {
 function WhosTurnIsITScreen(data, myTurn,isHost) {
   const targetTag = document.getElementById('WhosTurn');
   const playerNames = document.getElementById('playerNames')
+  const logo = document.getElementById('lobbyLogo')
+  const body = document.querySelector('body')
   playerNames.style.display = 'none'
   targetTag.innerHTML = `${data} turn `
 
   if(isHost){
+    logo.style.display = 'none'
+    body.style.cssText = 'background: radial-gradient(circle, rgb(209, 146, 137) 50%, rgba(131, 91, 85, 1));'
     randomPrompt = Math.floor(Math.random() * 93 )
     addSlider(0)
     socket.send(JSON.stringify({type: 'GetPrompts',line: randomPrompt}))

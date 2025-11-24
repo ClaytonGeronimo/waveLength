@@ -84,6 +84,7 @@ body{
   50% { transform: scale(1.2); } /* looks closer */
   100% { transform: scale(1); }
 }
+
 .LobbyNames{
     display: flex;
     align-items: center;
@@ -477,10 +478,28 @@ body{
 }
 
 
-#WhosTurn{
-    display: none;
-    text-align: center;
-    color:white
+#whosturnWrapper{
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgb(102, 100, 99);
+    font-size: 20px;
+    padding-left: 1%;
+    padding-right: 1%;
+    border-radius: 20px;
+    color: white;
+    background: rgb(41,35,30)
+}
+
+
+#whosturnHolder{
+    color: white;
+    display: inline-block;
+    white-space: nowrap;
+}
+#whosTurn{
+    font-size: 70px;
 }
 
 #startButton{
