@@ -51,21 +51,29 @@ socket.addEventListener('message', event => {
   }
   if (data.type == 'allGuessed') {
     evaluationScreen(data.points, data.message, data.myTurn)
+
   }
-  if(data.type == 'openHostCover'){
-    const wheelCover = document.querySelector('.circle2')
-    wheelCover.style.animation = "reveal 3s forwards";
-    const spinWheel = document.querySelector('.spinWheel');
-    const cards = document.querySelector('.cardholders')
+  if(data.type == 'updateHostForAllGuessed'){
+    updateHostForAllGuessed(data.players.slice(1))
     setTimeout(() => {
-      cards.style.display = "none"
-      spinWheel.style.display = "none"
-      wheelCover.style.animation = "";
-    }, 5000);
+      if(data.shotlist.length == 0){
+        HostSafeScreen()
+      }
+      else{
+        displayShotList(data.shotlist)
+      }
+      
+    }, 10000);
   }
 
   if(data.type == 'removePlayer'){
     removePlayerFromDisplay(data.username)
+  }
+  if(data.type == 'DisplayShotScreen'){
+    DisplayShotScreen()
+  }
+  if(data.type == 'DisplaySafeScreen'){
+    DisplaySafeScreen()
   }
 })
 
@@ -83,7 +91,6 @@ function displayPlayers(playerName) {
   updateLogo()
 
   let colors = ['(154,178,97)','(198,185,142)','(202,146,131)','(207,175,179)','(212,104,42)','(191,136,27)','(41,35,30)','(105,160,128)','(150,179,208)','(242,118,46)','(242,178,13)','(145,210,204)']
-  console.log(window.innerHeight)
 
   let positions = []
   let randomColor = Math.floor(Math.abs(Math.random() * (colors.length)))
@@ -151,8 +158,10 @@ function updateLogo(){
 function addSlider(value) {
   const targetDiv = document.querySelector('.spinWheel');
   const pin = document.querySelector('.pin');
+  const PinCushon = document.querySelector('.PinCushon')
   targetDiv.style.display = "flex"
   pin.style.transform = "translate(0, -50%) rotate(270deg)"
+  PinCushon.style.transform = "translate(0, -50%) rotate(270deg)"
   sliderColor(value)
   
 }
@@ -245,7 +254,7 @@ const rotateKnob = (e) => {
     if (angleDeg >= 180 && angleDeg <= 360) {
       pin.style.transform = `translate(0, -50%) rotate(${angleDeg}deg)`
       PinCushon.style.transform = `translate(0, -50%) rotate(${angleDeg}deg)`
-      console.log(Math.abs(Math.floor(angleDeg - 180)))
+      //console.log(Math.abs(Math.floor(angleDeg - 180)))
     }
 };
 
@@ -270,6 +279,7 @@ function addConfirmButtn() {
   const slider = document.getElementById("myRange")
   const confirmButton = document.createElement("button")
   const wheelCover = document.querySelector('.circle2')
+  const spinWheel = document.querySelector('.spinWheel')
   confirmButton.id = "confirmButton"
   confirmButton.innerHTML = "Confirm"
   targetDiv.appendChild(confirmButton)
@@ -277,7 +287,10 @@ function addConfirmButtn() {
   document.getElementById("confirmButton").addEventListener('click', () => {
     socket.send(JSON.stringify({ type: "guesedVal", value: Math.abs(Math.floor(angleDeg - 180)) }))
     confirmButton.remove()
-    waitingScreen()
+    // setTimeout(() => {
+    //   spinWheel.style.display = 'none'
+    // }, 3000);
+    // waitingScreen()
   });
 }
 
@@ -285,12 +298,14 @@ function addConfirmButtn() {
 // starts the game
 function startGame() {
   const data = { type: "startGame" }
-  const time = countDown(3, "WhosTurn", "Game Starts in: ", data, "Starting..")
+  const time = countDown(3, "gameStatus", "Game Starts in: ", data, "Starting..")
 }
 
 //
 function WhosTurnIsITScreen(data, myTurn,isHost) {
-  const targetTag = document.getElementById('WhosTurn');
+  const targetTag = document.getElementById('gameStatus');
+  const gameStatusHolder = document.getElementById('gameStatusHolder')
+  const gameStatusWrapper = document.getElementById('gameStatusWrapper')
   const playerNames = document.getElementById('playerNames')
   const logo = document.getElementById('lobbyLogo')
   const body = document.querySelector('body')
@@ -298,9 +313,11 @@ function WhosTurnIsITScreen(data, myTurn,isHost) {
   targetTag.innerHTML = `${data} turn `
 
   if(isHost){
+    gameStatusHolder.style.cssText = 'margin: 1%; display: block;'
+    gameStatusWrapper.style.cssText = 'left: -30%; font-size: 80px; '
     logo.style.display = 'none'
-    body.style.cssText = 'background: radial-gradient(circle, rgb(209, 146, 137) 50%, rgba(131, 91, 85, 1));'
-    randomPrompt = Math.floor(Math.random() * 93 )
+    body.style.cssText = 'background-image: url("../images/AnswerBackground.png")'
+    randomPrompt = Math.floor((Math.random() * Date.now()) % 93);
     addSlider(0)
     socket.send(JSON.stringify({type: 'GetPrompts',line: randomPrompt}))
     const cardHolder = document.querySelector('.cardholders')
@@ -311,7 +328,7 @@ function WhosTurnIsITScreen(data, myTurn,isHost) {
 }
 
 function clearwhosTurn() {
-  const targetTag = document.getElementById('WhosTurn');
+  const targetTag = document.getElementById('gameStatus');
   targetTag.innerHTML = ``
 }
 
@@ -378,12 +395,16 @@ function addReadyButton(playersTurn) {
   const targetDiv = document.getElementById('buttonHolders')
   const readyBttn = document.createElement('button')
   const wheel = document.querySelector('.spinWheel');
+  const gear = document.querySelector('.gear-inner')
+  const wheelCover = document.querySelector('.circle2')
   readyBttn.id = 'readyBttn'
   readyBttn.innerHTML = 'Ready'
 
   targetDiv.appendChild(readyBttn)
   readyBttn.addEventListener('click', () => {
-    socket.send(JSON.stringify({ type: 'startGuessing', playersTurn: playersTurn}))
+    gear.style.animation = ""
+    wheelCover.style.animation = ""
+    socket.send(JSON.stringify({ type: 'startGuessing', playersTurn: playersTurn}));
     wheel.style.display = "none"
     readyBttn.remove()
   })
@@ -393,6 +414,8 @@ function addReadyButton(playersTurn) {
 // creates a countdown with specified time, text and data to send
 function countDown(time, element, text, data, str = '') {
   const targetTag = document.getElementById(element)
+  const gameStatusHolder = document.getElementById("gameStatusHolder")
+  gameStatusHolder.style.display = 'block'
   targetTag.style.display = 'block'
   let timeLeft = time
   const timer = setInterval(function () {
@@ -416,6 +439,110 @@ function waitingScreen() {
 
 }
 
+function updateHostForAllGuessed(players){
+  const wheelCover = document.querySelector('.circle2')
+    wheelCover.style.animation = "reveal 3s forwards";
+    const spinWheel = document.querySelector('.spinWheel');
+    const cards = document.querySelector('.cardholders')
+    const leaderboard = document.querySelector('.sidebar');
+    const gameStatusWrapper = document.getElementById('gameStatusWrapper')
+    const background = document.querySelector('body')
+    const gamestatus = document.getElementById('gameStatus')
+    setTimeout(() => {
+      background.style.cssText = `background-image: url("../images/LeaderBoardBackground.png")`
+      gamestatus.innerHTML = 'LEADERBOARD'
+      gameStatusWrapper.style.cssText ='left: -20%; font-size: 80px; '
+      cards.style.display = "none"
+      spinWheel.style.display = "none"
+      wheelCover.style.animation = "";
+      leaderboard.style.display = 'block'
+      displayLeaderBoard(players)
+    }, 6000);
+}
+
+
+function displayLeaderBoard(players){
+
+    const LeaderboardList = document.querySelector('.list')
+    LeaderboardList.innerHTML = '';
+    for(let i = 0; i<players.length; i++){
+      if(i == 10){
+        break
+      }
+        const playerDiv = document.createElement('div')
+        const playerPostiion = document.createElement('div')
+        const PlayerScore = document.createElement('div')
+
+        playerDiv.classList.add("list-item")
+        playerDiv.dataset.id = i.toString()
+        playerDiv.dataset.score = (players[i].points).toString()
+        playerDiv.dataset.index = i
+
+        playerPostiion.classList.add("position")
+        playerPostiion.innerHTML = `${i+1}` + '. ' + players[i].username
+
+        PlayerScore.classList.add("score")
+        PlayerScore.innerHTML = players[i].points
+
+        playerDiv.append(playerPostiion)
+        playerDiv.append(PlayerScore)
+        LeaderboardList.append(playerDiv)
+
+    }
+    document.querySelectorAll('.list-item').forEach((item, i) => {
+        item.style.transform = `translateY(${i * 60}px)`;
+        item.style.fontSize = `${50 - (i*4)}px`;
+
+    });
+      setTimeout(() => { 
+         changespots(players)}, 2000);
+}
+
+
+
+function changespots(players){
+    players.sort((a, b) => b.points - a.points);
+    const items = document.querySelectorAll(".list-item");
+    items.forEach((item, i) => {
+    // Find the player this div represents
+        const playerName = item.children[0].innerHTML.split(". ")[1]
+        const newIndex = players.findIndex(p => p.username === playerName);
+        item.children[0].innerHTML = `${newIndex+1}. ${playerName}`
+        item.style.transform = `translateY(${newIndex * 60}px)`;
+        item.style.fontSize = `${50 - (newIndex*4)}px`;
+    });
+}
+
+function displayShotList(shotlist){
+  body = document.querySelector('body')
+  sidebar = document.querySelector('.sidebar')
+  sidebar.classList.remove('sidebar')
+  sidebar.classList.add('shotlist')
+  gamestatus = document.getElementById('gameStatusWrapper')
+  shotTimeLogo = document.getElementById('shotTimeLogo')
+
+  shotTimeLogo.style.display = 'block'
+  shotTimeLogo.style.backgroundImage = 'url("../images/TakeAShotIcon.png")'
+  shotTimeLogo.style.animation = 'popup 1s forwards'
+
+
+  gamestatus.style.display = 'none'
+  body.style.background = 'radial-gradient(circle, rgb(212, 104, 42) 50%, rgba(126, 62, 25, 1))'
+
+  socket.send(JSON.stringify({type: "SafeOrShotScreen"}))
+
+  displayLeaderBoard(shotlist)
+  
+
+  setTimeout(() => { 
+      shotTimeLogo.style.display = 'none'
+      sidebar.classList.remove('shotlist')
+      sidebar.classList.add('sidebar')
+      sidebar.style.display = 'none'
+      socket.send(JSON.stringify({ type: "startGame" }));
+       }, 5000);
+}
+
 function evaluationScreen(points, message, myTurn) {
   const targetTag = document.getElementById('playerPoints')
   targetTag.innerHTML = `Points: ${points}`
@@ -424,20 +551,155 @@ function evaluationScreen(points, message, myTurn) {
   const wheelCover = document.querySelector('.circle2')
   const spinWheel = document.querySelector('.spinWheel');
   const wheel = document.querySelector('.gear-inner')
+
   
   wheelCover.style.animation = "reveal 3s forwards";
-  console.log("hello1")
   if (myTurn) {
-    setTimeout(() => { 
-      socket.send(JSON.stringify({ type: "startGame" }));
-       wheelCover.style.animation = "";
-       wheel.style.animation = ""}, 5000);
+    wheelCover.style.animation = "";
+    wheel.style.animation = ""
   }
-  // else{
-  //   setTimeout(() => {
-  //     wheelCover.style.animation = "";
-  //     spinWheel.style.display = "none"
-  //   }, 3000);
-  // }
+  else{
+    setTimeout(() => {
+      wheelCover.style.animation = "";
+      spinWheel.style.display = "none"
+    }, 8000);
+  }
+}
 
+function HostSafeScreen(){
+  gameStatusHolder = document.getElementById('gameStatusHolder')
+  mainbody = document.querySelector('body')
+  body = document.getElementById('body')
+  slidebar = document.querySelector('.sidebar')
+
+  gameStatusHolder.style.display = 'none'
+  slidebar.style.display = 'none'
+
+  mainbody.style.background = 'radial-gradient(circle, rgb(154, 178, 97) 50%, rgba(112, 129, 70, 1))'
+
+  Safelogo = document.createElement('div')
+  Safelogo.id = 'Safelogo'
+
+  setTimeout(() => {
+    mainbody.style.background = 'radial-gradient(circle, rgba(6, 77, 87, 1) 50%, rgb(4, 52, 58, 1))'
+    socket.send(JSON.stringify({ type: "startGame" }));
+    console.log("hello")
+  }, 5000);
+
+}
+
+function DisplayShotScreen(){
+  logo = document.getElementById('lobbyLogo')
+  statusbar = document.getElementById('statusBar')
+  mainBody = document.querySelector('body')
+  body = document.getElementById('body')
+
+  logo.style.display = 'none'
+  statusbar.style.display = 'none'
+  mainBody.style.background = 'radial-gradient(circle, rgb(212, 104, 42) 50%, rgba(126, 62, 25, 1))'
+
+  ShotLogoWrapper = document.createElement('div')
+  ShotLogoWrapper.id = 'ShotLogoWrapper'
+  ShotLogo = document.createElement('h1')
+  ShotLogo.id = 'ShotLogo'
+
+  ShotLogo.innerHTML = "WAVELENGTH"
+
+  ShotLogoWrapper.appendChild(ShotLogo)
+
+  gifwrapper = document.createElement('div')
+  gifwrapper.id = 'gifwrapper'
+
+  gif = document.createElement('div')
+  gif.id = 'gif'
+
+  gif.style.backgroundImage = `url("../images/TaketheL.gif")`
+  
+  gifwrapper.appendChild(gif)
+
+  
+  shotOclockLogoWrapper = document.createElement('div')
+  shotOclockLogoWrapper.id = 'shotOclockLogoWrapper'
+
+  shotOclockLogo = document.createElement('img')
+  shotOclockLogo.id = 'shotOclockLogo'
+  shotOclockLogo.src = "../images/TakeAShotIcon.png"
+  shotOclockLogoWrapper.appendChild(shotOclockLogo)
+
+  message = document.createElement('div')
+  message.id = 'message'
+
+  message.innerHTML = '🤪 TAKE YOUR SHOT DUDE 🤪'
+
+
+  body.appendChild(ShotLogoWrapper)
+  body.appendChild(gifwrapper)
+  body.appendChild(shotOclockLogoWrapper)
+  body.appendChild(message)
+
+  setTimeout(() => {
+    logo.style.display = 'block'
+    statusbar.style.display = 'flex'
+    mainBody.style.background = 'radial-gradient(circle, rgba(6, 77, 87, 1) 50%, rgb(4, 52, 58, 1))'
+
+    ShotLogoWrapper.remove()
+    gifwrapper.remove()
+    shotOclockLogoWrapper.remove()
+    message.remove()
+
+  }, 5000);
+
+
+}
+
+function DisplaySafeScreen(){
+  logo = document.getElementById('lobbyLogo')
+  statusbar = document.getElementById('statusBar')
+  mainBody = document.querySelector('body')
+  body = document.getElementById('body')
+
+  logo.style.display = 'none'
+  statusbar.style.display = 'none'
+  mainBody.style.background = 'radial-gradient(circle, rgb(154, 178, 97) 50%, rgba(112, 129, 70, 1))'
+
+  ShotLogoWrapper = document.createElement('div')
+  ShotLogoWrapper.id = 'ShotLogoWrapper'
+  ShotLogo = document.createElement('h1')
+  ShotLogo.id = 'ShotLogo'
+
+  ShotLogo.innerHTML = "WAVELENGTH"
+
+  ShotLogoWrapper.appendChild(ShotLogo)
+
+  gifwrapper = document.createElement('div')
+  gifwrapper.id = 'gifwrapper'
+
+  gif = document.createElement('div')
+  gif.id = 'gif'
+
+  gif.style.backgroundImage = `url("../images/SafeGif.gif")`
+  
+  gifwrapper.appendChild(gif)
+
+
+  message = document.createElement('div')
+  message.id = 'safeMessage'
+
+  message.innerHTML = 'YOU ARE SAFE\n ✋😌 \nNO SHOT FOR YOU'
+
+
+  body.appendChild(ShotLogoWrapper)
+  body.appendChild(gifwrapper)
+  body.appendChild(message)
+
+  setTimeout(() => {
+    logo.style.display = 'block'
+    statusbar.style.display = 'flex'
+    mainBody.style.background = 'radial-gradient(circle, rgba(6, 77, 87, 1) 50%, rgb(4, 52, 58, 1))'
+
+    ShotLogoWrapper.remove()
+    gifwrapper.remove()
+    message.remove()
+
+  }, 5000);
 }

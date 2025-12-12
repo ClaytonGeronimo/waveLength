@@ -90,7 +90,7 @@ body{
     align-items: center;
     justify-content: center;
     border: 2px solid rgb(255, 228, 210);
-    animation: breathing 5s infinite;
+    animation: breathing 8s infinite;
     font-size: 20px;
     padding-left: 1%;
     padding-right: 1%;
@@ -99,6 +99,107 @@ body{
 }
 
 
+.sidebar {
+  background: #eeeeee00;
+  display: none;
+  position: relative;
+  float: right;
+  left: -5%;
+  width: 500px;
+  height: 600px;
+  padding: 10px;
+  margin: 20px 0; 
+  overflow: hidden;
+  color: white;
+}
+
+
+
+.shotlist{
+    background: rgb(41, 31, 30);
+    position: relative;
+    float: right;
+    left: -25%;
+    top: 300;
+    width: 800px;
+    height: 600px;
+    padding: 10px;
+    margin: 20px 0;
+    overflow: hidden;
+    color: white;
+    border-radius: 100px;
+    border: 5px solid rgb(102, 100, 99);
+}
+
+#names{
+    text-align: center;
+}
+
+@keyframes popup{
+    0% { transform: scale(1); }
+  50% { transform: scale(2); } /* looks closer */
+  100% { transform: scale(1); }
+}
+#shotTimeLogo {
+    display: none;
+      width: 800px;
+    position: absolute;
+    height: 600px;
+    background-position: center;
+    background-size: 1300px 800px;
+    background-repeat: no-repeat;
+}
+
+.scroll-container {
+  height: 100%;
+  
+}
+
+.list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  flex: 1;
+  height: 36px;
+  will-change: transform;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  font-size: 70px;
+  transition: transform 0.5s ease;
+  z-index: 1;
+  font-family: Impact, fantasy;
+  letter-spacing: 2px;
+  gap: 60px
+}
+  
+  &.current-player {
+    background: yellow;
+    z-index: 2;
+  }
+
+  .position {
+    float: left;
+  }
+ 
+  .score {
+    float: right;
+  }
+
+
+@for $i from 0 through 32 {
+  .list-item:nth-child(#{$i}) {
+    transform: translateY(#{($i - 1) * 36}px);
+  }
+}
 
 #playerNames{
     display: none;
@@ -477,30 +578,34 @@ body{
 
 }
 
-
-#whosturnWrapper{
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid rgb(102, 100, 99);
-    font-size: 20px;
-    padding-left: 1%;
-    padding-right: 1%;
-    border-radius: 20px;
+#gameStatusHolder{
+    position: relative;
     color: white;
-    background: rgb(41,35,30)
-}
-
-
-#whosturnHolder{
-    color: white;
-    display: inline-block;
+    display: none;
+    justify-content: center; /* horizontally center children */
+    align-items: center;     /* vertically center children */
+    text-align: center;
     white-space: nowrap;
 }
-#whosTurn{
-    font-size: 70px;
+
+#gameStatusWrapper{
+    position: relative;
+    top:0%;
+    display: inline-block;
+    align-items: center;
+    justify-content: center;
+    border: 5px solid rgb(102, 100, 99);
+    padding-left: 2%;
+    padding-right: 2%;
+    border-radius: 100px;
+    color: white;
+    background: rgb(41,35,30);
+    font-family: Impact, fantasy;
+    letter-spacing: 3px;
+    font-size: 50px;
 }
+
+
 
 #startButton{
     margin: 0%;
@@ -534,6 +639,40 @@ label{
     align-items: center;
 } 
 
+#ShotLogoWrapper{
+    position: relative;
+    display: flex;
+    color: white;
+    justify-content: center; /* horizontally center children */
+    
+}
+
+#ShotLogo{
+    display: flex;
+    text-align: center;
+    background: rgb(41, 35, 30);
+    font-size: 20px;
+    border-radius: 20px;
+    border: 3px solid rgb(102, 100, 99);
+
+}
+
+#gifwrapper{
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+#gif{
+    width: 200px;
+    height: 200px;
+    text-align: center;
+    background: black;
+    background-size: cover;
+    background-repeat: no-repeat;
+    border-radius: 100px;
+    border: 5px solid rgb(102, 100, 99);
+}
 
 @media (max-width: 1000px){
   body{
@@ -596,7 +735,7 @@ label{
     }
 
     #statusBar{
-        background-image: url("../images/statusbarBackground.png");
+        background: radial-gradient(circle, rgb(41, 35, 40) 50%, rgb(41, 35, 40));
         border-radius: 12px;
         width: 100%;
         height: 200px;
@@ -609,18 +748,20 @@ label{
     }
     #statusWrapper{
         display: flex;
-        gap: 10%
+        gap: 20%
     }
 
     #playerName{
-        background: rgb(31, 30, 30);
-        border: 3px solid rgb(43, 43, 43);
+        background: rgb(207, 175, 179);
+        border: 5px solid rgb(126, 122, 119);
+        border-radius: 30px;
         text-align: center;
         font-size: 50px;
     }
     #playerPoints{
-        background: rgb(31, 30, 30);
-        border: 3px solid rgb(43, 43, 43);
+        background: rgb(154, 178, 97);
+        border: 5px solid rgb(126, 122, 119);
+        border-radius: 30px;
         text-align: center;
         font-size: 50px;
     }
@@ -648,11 +789,11 @@ label{
         color:white
     }
     #confirmButton{
-        width: 460px;
+        width: 520px;
         height: 190px;
         border-radius: 150px;
         border: 6px solid rgb(41, 35, 30);
-        font-size: 150px;
+        font-size: 140px;
         background: rgb(198,185,142);
         font-family: Impact, fantasy;
         color:white
@@ -668,7 +809,7 @@ label{
     .spinWheel {
     display: none;
     height:800px;
-    width: 100%;
+    width: 90%;
     margin: 30px;
     justify-content: center;
     align-items: center;
@@ -829,5 +970,72 @@ label{
         /* now 0deg = left */
     }
 
+        #ShotLogoWrapper{
+        position: relative;
+        display: flex;
+        color: white;
+        justify-content: center; /* horizontally center children */
+        margin: 100px
         
+    }
+
+    #ShotLogo{
+        display: flex;
+        font-family: 'Oswald',sans-serif;
+        text-align: center;
+        background: rgb(41, 35, 30);
+        font-size: 100px;
+        border-radius: 100px;
+        padding: 8px;
+        border: 8px solid rgb(102, 100, 99);
+
+    }
+    #gifwrapper{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    }
+
+    #gif{
+        width: 500px;
+        height: 500px;
+        text-align: center;
+        background: black;
+        background-size: cover;
+        background-repeat: no-repeat;
+        border-radius: 500px;
+        border: 9px solid rgb(102, 100, 99);
+    }
+    
+    #shotOclockLogoWrapper{
+        position: relative;
+        display: flex;
+        justify-content: center;
+    }
+
+    #shotOclockLogo{
+        width: 1100px;
+        height: 700px;
+        text-align: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+
+    #message{
+        text-align: center;
+        color: white;
+        font-size: 60px;
+        font-family: 'Oswald',sans-serif;
+    }   
+
+    #safeMessage{
+        text-align: center;
+        margin: 80px;
+        color: white;
+        font-size: 60px;
+        font-family: 'Oswald',sans-serif;
+        background-color: rgb(41, 35, 30);
+        border-radius: 20px;
+        border: 5px solid rgb(102, 100, 99);
+    }
 }

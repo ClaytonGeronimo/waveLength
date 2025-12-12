@@ -34,6 +34,8 @@ const players = []
 playersTurn = 1
 clueVlaue = null
 let statusBarUpdated = false;
+let shotlist = []
+
 
 wss.on('connection', ws => {
   console.log('🟢 New client connected'); 
@@ -62,17 +64,20 @@ wss.on('connection', ws => {
     if(data.type == 'guesedVal'){
       updateGuess(data.value)
     }
+    if(data.type == 'SafeOrShotScreen'){
+      SafeOrShotScreen()
+    }
   });
 
   function newClient(username){
     if(username == 'host'){
-      players.push({username: username, points: 0, guess: null, clientID: ws, guessed: false})
+      players.push({username: username, points: 0, guess: null, clientID: ws, guessed: false, message: null})
       clients.set(username,ws)
       clients.get('host').send(JSON.stringify({type: 'MainMenu'}))
       clients.get('host').send(JSON.stringify({type: 'updatePlayerBoard', playerName: username}))
     }
     else{
-      players.push({username: username, points: 0, guess: null, clientID: ws, guessed: false})
+      players.push({username: username, points: 0, guess: null, clientID: ws, guessed: false,  message: null})
       clients.set(username,ws)
       ws.send(JSON.stringify({type: "waitingScreen"}))
       clients.get('host').send(JSON.stringify({type: 'updatePlayerBoard' , playerName: username}))
@@ -176,14 +181,13 @@ wss.on('connection', ws => {
 
   function updatepoints(pointsgained){
     let cluegiverGainedPoints = 0
+    shotlist = []
     for(let i = 0; i < players.length; i++){
       let threePoints = (players[i].guess == clueVlaue || (players[i].guess >= clueVlaue - 3 && players[i].guess <= clueVlaue + 2 ))
       let twoPoints = ((players[i].guess < clueVlaue -3 && players[i].guess >= clueVlaue - 9) || (players[i].guess >= clueVlaue + 3 && players[i].guess <= clueVlaue + 8))
       let onePoint = ((players[i].guess >= clueVlaue - 16 && players[i].guess < clueVlaue - 9) || (players[i].guess > clueVlaue + 8 && players[i].guess <= clueVlaue + 16) )
       
-      if(i==0){
-        players[i].clientID.send(JSON.stringify({type: 'openHostCover'}))
-      }
+      
       if(i != playersTurn && i != 0){
         if(threePoints || twoPoints || onePoint){
           if(threePoints){
@@ -199,29 +203,36 @@ wss.on('connection', ws => {
               players[i].points += 1
               cluegiverGainedPoints += 1
             }
-            players[i].clientID.send(JSON.stringify({type: 'allGuessed',points: players[i].points, message: "Your Safe!", myTurn: false}))
+            players[i].clientID.send(JSON.stringify({type: 'allGuessed',points: players[i].points, message: "Safe", myTurn: false}))
+            players[i].message = "Safe"
           }
 
           else {
-            players[i].clientID.send(JSON.stringify({type: 'allGuessed',points: players[i].points, message: "Drink up buddy", myTurn: false  }))
+            players[i].clientID.send(JSON.stringify({type: 'allGuessed',points: players[i].points, message: "Drink", myTurn: false  }))
+            players[i].message = "Drink"
+            shotlist.push({...players[i]})
           }
       }
 
     }
 
-    
+
     players[playersTurn].points += cluegiverGainedPoints
     if(cluegiverGainedPoints == 0){
-      players[playersTurn].clientID.send(JSON.stringify({type: 'allGuessed',points: players[playersTurn].points, message: "Drink up buddy", myTurn: true  }))
+      players[playersTurn].clientID.send(JSON.stringify({type: 'allGuessed',points: players[playersTurn].points, message: "Drink", myTurn: true  }))
+      players[playersTurn].message = "Drink"
+      shotlist.push({...players[playersTurn]})
     }
     else{
-      players[playersTurn].clientID.send(JSON.stringify({type: 'allGuessed',points: players[playersTurn].points, message: "well done!", myTurn: true  }))
+      players[playersTurn].clientID.send(JSON.stringify({type: 'allGuessed',points: players[playersTurn].points, message: "Safe", myTurn: true  }))
+      players[playersTurn].message = "Safe"
     }
 
     if(playersTurn == players.length-1){
         playersTurn = 0
       }
     playersTurn += 1
+    clients.get('host').send(JSON.stringify({type: 'updateHostForAllGuessed', players: players, shotlist: shotlist}))
     
   }
 
@@ -239,8 +250,23 @@ wss.on('connection', ws => {
 
       }
     }
+
   }
   
+  function SafeOrShotScreen(){
+    players.forEach(player =>{
+      if(player.username != 'host'){
+        console.log(player.message)
+          if(player.message == 'Drink'){
+          player.clientID.send(JSON.stringify({type: 'DisplayShotScreen'}))
+        }
+        else if(player.message == 'Safe'){
+          player.clientID.send(JSON.stringify({type: 'DisplaySafeScreen'}))
+        }
+      }
+      
+    })
+  }
 
   ws.on('close', () => {
     console.log('🔴 Client disconnected');
@@ -252,7 +278,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 server.listen(3000, '0.0.0.0', () => {
   console.log("✅ Listening on all interfaces (e.g. http://192.168.x.x:3000)");
 });
-
 
 
 
